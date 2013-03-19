@@ -1,67 +1,85 @@
 class core {
-  
     exec { "apt-update":
       command => "/usr/bin/sudo apt-get -y update"
     }
   
     package { 
       [ "vim", "git-core", "build-essential" ]:
-        ensure => ["installed"],
-        require => Exec['apt-update']    
+        ensure => installed,
+        require => Exec['apt-update'];
     }
 }
 
 class python {
-
     package { 
       [ "python", "python-setuptools", "python-dev", "python-pip",
         "python-matplotlib", "python-imaging", "python-numpy", "python-scipy",
         "ipython-notebook" ]:
-        ensure => ["installed"],
-        require => Exec['apt-update']    
+        ensure => installed,
+        require => Exec['apt-update'];
     }
 
-    exec {
-      "virtualenv":
-      command => "/usr/bin/sudo pip install virtualenv",
-      require => Package["python-dev", "python-pip"]
+    package {
+      [ "virtualenv", "virtualenvwrapper" ]:
+      ensure => installed,
+      provider => pip;
     }
 
-}
-
-class networking {
-    package { 
-      [ "snmp", "curl", "wget" ]:
-        ensure => ["installed"],
-        require => Exec['apt-update']    
+    package {
+      "ipython":
+      ensure => "0.13.1",
+      provider => pip;
     }
-    
 }
 
 class web {
-
     package { 
-      [ "apache2", "postgresql", "sqlite3" ]:
-        ensure => ["installed"],
-        require => Exec['apt-update']    
+      [ "apache2", "postgresql", "sqlite3", "libapache2-mod-wsgi", 
+        "snmp", "curl", "wget" ]:
+          ensure => installed
     }
 
-    exec {
+    service {
+        "apache2":
+            enable => true,
+            ensure => running,
+            hasstatus => true,
+            require => Package["apache2"],
+            subscribe => [ Package[ "apache2", "libapache2-mod-wsgi" ] ],
+    }
+
+    package {
       "django":
-      command => "/usr/bin/sudo pip install django",
-      require => Package["python-pip"],
+        ensure => installed,
+        provider => pip,
+        require => Package['python-pip'];
     }
 
-    exec {
+    package {
       "flask":
-      command => "/usr/bin/sudo pip install django",
-      require => Package["python-pip"],
+        ensure => installed,
+        require => Package['python-pip'],
+        provider => pip;
     }
 }
 
+class flyscript {
+    package {
+      "flyscript":
+        ensure => installed,
+        provider => pip;
+    }
+
+    package {
+      "markdown":
+        ensure => installed,
+        provider => pip;
+    }
+}
+
+
 include core
 include python
-include networking
 include web
-
+include flyscript
 

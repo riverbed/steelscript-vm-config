@@ -14,7 +14,7 @@ class python {
     package { 
       [ "python", "python-setuptools", "python-dev", "python-pip",
         "python-matplotlib", "python-imaging", "python-numpy", "python-scipy",
-        "ipython-notebook" ]:
+        "python-pandas", "ipython-notebook", "python-nose" ]:
         ensure => installed,
         require => Exec['apt-update'];
     }
@@ -26,7 +26,7 @@ class python {
     }
 
     package {
-      "ipython":
+      ["ipython"]:
       ensure => "0.13.1",
       provider => pip;
     }
@@ -72,6 +72,12 @@ class flyscript {
 
     package {
       "markdown":
+        ensure => installed,
+        provider => pip;
+    }
+
+    package {
+      [ "djangorestframework", "jsonfield", "django-model-utils", "pygeoip" ]:
         ensure => installed,
         provider => pip;
     }

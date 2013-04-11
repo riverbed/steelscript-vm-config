@@ -95,13 +95,6 @@ class flyscript_portal {
         owner => "www-data",
         group => "www-data",
         recurse => true;
-      ### This is temp only until configs committed
-      "/flyscript/flyscript_portal/project/settings.py":
-        content => template("portal/settings.py"),
-        require => Exec['portal_checkout'],
-        owner => "www-data",
-        group => "www-data",
-        ensure => file;
     }
 
     exec {
@@ -111,7 +104,6 @@ class flyscript_portal {
         path => '/usr/local/bin:/usr/bin:/bin',
         creates => '/flyscript/flyscript_portal/.git',
         notify => [ Exec['portal_setup'], 
-                    File['/flyscript/flyscript_portal/project/settings.py'],
         ],
         refreshonly => true;
     }
@@ -133,7 +125,6 @@ class flyscript_portal {
         command => 'sudo python manage.py collectstatic --noinput',
         path => '/flyscript/flyscript_portal:/usr/local/bin:/usr/bin:/bin',
         creates => '/flyscript/flyscript_portal/static/bootstrap',
-        require => File['/flyscript/flyscript_portal/project/settings.py'],
         notify => [ Exec['portal_permissions'], 
         ],
         refreshonly => true;

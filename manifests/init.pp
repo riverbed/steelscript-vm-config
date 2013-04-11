@@ -34,7 +34,7 @@ class python {
 
 class web {
     package { 
-      [ "apache2", "postgresql", "sqlite3", "libapache2-mod-wsgi", 
+      [ "apache2", "sqlite3", "libapache2-mod-wsgi", 
         "snmp", "curl", "wget" ]:
           ensure => installed
     }

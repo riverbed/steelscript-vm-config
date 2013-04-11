@@ -1,0 +1,8 @@
+<VirtualHost *:80>
+	#DocumentRoot /usr/local/share/wsgi/mysite/media
+	Alias /static /flyscript/flyscript_portal/static
+	WSGIScriptAlias / /flyscript/wsgi/flyscript_portal.wsgi
+	WSGIDaemonProcess flyscript_portal processes=<%= processorcount %>
+	WSGIProcessGroup flyscript_portal
+  #WSGIPythonPath /flyscript/wsgi:/flyscript/flyscript_portal
+</VirtualHost>

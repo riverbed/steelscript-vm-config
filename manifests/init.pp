@@ -12,7 +12,7 @@ class core {
 
 class python {
     package { 
-      [ "python", "python-setuptools", "python-dev", "python-pip",
+      [ "python", "python-setuptools", "python-dev", "python-pip", "sqlite3", 
         "python-matplotlib", "python-imaging", "python-numpy", "python-scipy",
         "python-pandas", "ipython-notebook", "python-nose" ]:
         ensure => installed,
@@ -34,16 +34,9 @@ class python {
 
 class web {
     package { 
-      [ "apache2", "sqlite3", "libapache2-mod-wsgi", 
+      [ "apache2", "libapache2-mod-wsgi", 
         "snmp", "curl", "wget" ]:
           ensure => installed
-    }
-
-    package {
-      "django":
-        ensure => installed,
-        provider => pip,
-        require => Package['python-pip'];
     }
 
     file {
@@ -79,7 +72,29 @@ class web {
 
 }
 
+class flyscript {
+    package {
+      "flyscript":
+        ensure => latest,
+        provider => pip;
+    }
+}
+
 class flyscript_portal {
+    package {
+      [ "django", "djangorestframework", "markdown", "django-model-utils", 
+        "pygeoip", "django-extensions", "python-dateutil", "pytz", "six" ]:
+        ensure => installed,
+        provider => pip,
+        require => Package['python-pip'];
+    }
+
+    package {
+      "jsonfield":
+        ensure => "0.9.5",
+        provider => pip;
+    }
+
     file {
       "/flyscript":
         ensure => directory,
@@ -103,6 +118,8 @@ class flyscript_portal {
         command => 'git clone git://github.com/riverbed/flyscript-portal.git flyscript_portal',
         path => '/usr/local/bin:/usr/bin:/bin',
         creates => '/flyscript/flyscript_portal/.git',
+        require => Package[ "django", "djangorestframework", "markdown", "django-model-utils", 
+        "pygeoip", "django-extensions", "python-dateutil", "pytz", "six" ],
         notify => [ Exec['portal_setup'], 
         ],
         refreshonly => true;
@@ -133,7 +150,7 @@ class flyscript_portal {
     exec {
       'portal_permissions':
         cwd => '/flyscript/flyscript_portal',
-        command => 'chown -R www-data:www-data *',
+        command => 'sudo chown -R www-data:www-data *',
         path => '/flyscript/flyscript_portal:/usr/local/bin:/usr/bin:/bin',
         notify => [ Service['apache2'],
         ],
@@ -141,26 +158,6 @@ class flyscript_portal {
     }
 }
 
-class flyscript {
-    package {
-      "flyscript":
-        ensure => latest,
-        provider => pip;
-    }
-
-    package {
-      "jsonfield":
-        ensure => "0.9.5",
-        provider => pip;
-    }
-
-    package {
-      [ "djangorestframework", "markdown", "django-model-utils", 
-        "pygeoip", "django-extensions" ]:
-        ensure => installed,
-        provider => pip;
-    }
-}
 
 
 include core

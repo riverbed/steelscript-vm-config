@@ -83,7 +83,7 @@ class flyscript {
 class flyscript_portal {
     package {
       [ "django", "djangorestframework", "markdown", "django-model-utils", 
-        "pygeoip", "django-extensions", "python-dateutil", "pytz", "six" ]:
+        "pygeoip", "django-extensions" ]:
         ensure => installed,
         provider => pip,
         require => Package['python-pip'];
@@ -119,7 +119,7 @@ class flyscript_portal {
         path => '/usr/local/bin:/usr/bin:/bin',
         creates => '/flyscript/flyscript_portal/.git',
         require => Package[ "django", "djangorestframework", "markdown", "django-model-utils", 
-        "pygeoip", "django-extensions", "python-dateutil", "pytz", "six" ],
+        "pygeoip", "django-extensions" ],
         notify => [ Exec['portal_setup'], 
         ],
         refreshonly => true;

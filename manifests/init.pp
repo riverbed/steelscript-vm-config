@@ -134,7 +134,7 @@ class flyscript_portal {
     exec {
       'portal_setup':
         cwd => '/flyscript/flyscript_portal',
-        command => 'clean',
+        command => 'sudo python manage.py syncdb --noinput',
         path => '/flyscript/flyscript_portal:/usr/local/bin:/usr/bin:/bin',
         creates => '/flyscript/flyscript_portal/project.db',
         notify => [ Exec['portal_static_files'], 

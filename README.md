@@ -29,17 +29,16 @@ or one of the Github GUI clients: [OSX](http://mac.github.com/), [Windows] (http
 
 ### FlyScript Portal
 
-1. Login to the VM and configure your Riverbed devices
+1. On your host machine, head to the URL [http://127.0.0.1:30080](http://127.0.0.1:30080) and the portal should appear!
+2. You will see a page with form fields for a profiler and shark appliance, fill out the IP address/port and Username/Password for each appliance
+3. Click the "Reports" button on the navigation bar, and run a report!
+
+To customize the reports that are available and take a peek under the hood, you can ssh directly into the VM and look at each of the report files:
 
         $ vagrant ssh
-        vagrant@precise32:~$ cd /flyscript/flyscript_portal
-        vagrant@precise32:/flyscript/flyscript_portal$ vim config/devices.py
-            <edit your hosts and username/passwords for a Profiler and Shark appliance>
+        vagrant@precise32:~$ cd /flyscript/flyscript_portal/config/reports
 
-
-2. Now on your host machine, head to the URL [http://127.0.0.1:38888](http://127.0.0.1:38888) and the portal should appear!
-3. Look at the configuration files under `/flyscript/flyscript_portal/config/reports`, these are the source files for each of the report pages in the portal.  
-4. For further information, see the following descriptions about Portal and how to customize it:
+For further information, see the following descriptions about Portal and how to customize it:
 
     [Introducing the FlyScript Portal](https://splash.riverbed.com/docs/DOC-1765)
     [FlyScript Portal on GitHub](https://github.com/riverbed/flyscript-portal)

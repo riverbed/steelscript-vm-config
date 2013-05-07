@@ -3,12 +3,28 @@
 # forth at https://github.com/riverbed/flyscript-vm-config/blob/master/LICENSE
 # ("License").  This software is distributed "AS IS" as set forth in the License.
 
+stage { 'first': before => Stage['main'] }
 
-class core {
-    exec { "apt-update":
-      command => "/usr/bin/sudo apt-get -y update"
+class setup {
+    file {
+      "/root/.pip":
+        ensure => directory;
+
+      "/root/.pip/pip.conf":
+        content => template("portal/pip.conf"),
+        require => File["/root/.pip"],
+        recurse => true,
+        ensure => file;
     }
+
+    exec { "apt-update":
+      command => "/usr/bin/sudo apt-get -y update",
+      require => File["/root/.pip/pip.conf"];
+    }
+}
+class { "setup": stage => first }
   
+class core {
     package { 
       [ "vim", "git-core", "build-essential" ]:
         ensure => installed,
@@ -22,7 +38,6 @@ class python {
         "python-matplotlib", "python-imaging", "python-numpy", "python-scipy",
         "python-pandas", "ipython-notebook", "python-nose" ]:
         ensure => installed,
-        require => Exec['apt-update'];
     }
 
     package {
@@ -42,7 +57,8 @@ class web {
     package { 
       [ "apache2", "libapache2-mod-wsgi", 
         "snmp", "curl", "wget" ]:
-          ensure => installed
+          ensure => installed,
+          require => Exec['apt-update'];
     }
 
     file {
@@ -148,6 +164,16 @@ class flyscript_portal {
         command => 'sudo python manage.py collectstatic --noinput',
         path => '/flyscript/flyscript_portal:/usr/local/bin:/usr/bin:/bin',
         creates => '/flyscript/flyscript_portal/static/bootstrap',
+        notify => [ Exec['portal_reload'], 
+        ],
+        refreshonly => true;
+    }
+
+    exec {
+      'portal_reload':
+        cwd => '/flyscript/flyscript_portal',
+        command => 'sudo python manage.py reload',
+        path => '/flyscript/flyscript_portal:/usr/local/bin:/usr/bin:/bin',
         notify => [ Exec['portal_permissions'], 
         ],
         refreshonly => true;

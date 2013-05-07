@@ -17,7 +17,8 @@ Vagrant::Config.run do |config|
      puppet.manifest_file  = "init.pp"
      puppet.module_path = "modules"
      puppet.options = "--verbose --debug"
-     #puppet.options = "--verbose"
+     # Uncomment the following line and update proxy values if behind a proxy
+     #puppet.options = "--verbose --debug --http_proxy_host=<proxy_host> --http_proxy_port=<proxy_port>"
    end
    
 end

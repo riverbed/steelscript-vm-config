@@ -105,7 +105,7 @@ class flyscript {
 class flyscript_portal {
     package {
       [ "django", "djangorestframework", "markdown", "django-model-utils", 
-        "pygeoip", "django-extensions" ]:
+        "pygeoip", "django-extensions", "pysnmp" ]:
         ensure => installed,
         provider => pip,
         require => Package['python-pip'];

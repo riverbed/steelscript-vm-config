@@ -36,8 +36,8 @@ class python {
     package { 
       [ "python", "python-setuptools", "python-dev", "python-pip", "sqlite3", 
         "python-matplotlib", "python-imaging", "python-numpy", "python-scipy",
-        "python-pandas", "ipython-notebook", "python-nose" ]:
-        ensure => installed,
+        "python-pandas", "ipython-notebook", "python-nose", "snmpd" ]:
+        ensure => installed;
     }
 
     package {
@@ -108,13 +108,22 @@ class flyscript_portal {
         "pygeoip", "django-extensions", "pysnmp" ]:
         ensure => installed,
         provider => pip,
-        require => Package['python-pip'];
+        require => Package['python-pip', 'python-dev'];
     }
 
     package {
       "jsonfield":
         ensure => "0.9.5",
-        provider => pip;
+        provider => pip,
+        require => Package['python-pip'];
+    }
+
+    package {
+      # we need to update pandas past what is provided by Ubuntu packages
+      "pandas":
+        ensure => latest,
+        provider => pip,
+        require => Package['python-pip', 'python-pandas'];
     }
 
     file {

@@ -127,7 +127,7 @@ class flyscript_portal {
     package {
       # we need to update pandas past what is provided by Ubuntu packages
       "pandas":
-        ensure => latest,
+        ensure => "0.10.1",
         provider => pip,
         require => Package['python-pip', 'python-pandas'];
     }

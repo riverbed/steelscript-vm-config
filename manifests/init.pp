@@ -100,6 +100,12 @@ class flyscript {
         ensure => latest,
         provider => pip;
     }
+
+    package { 
+      [ "wireshark", "tshark" ]:
+        ensure => installed,
+        require => Exec['apt-update'];
+    }
 }
 
 class flyscript_portal {

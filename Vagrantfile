@@ -4,22 +4,29 @@
 # ("License").  This software is distributed "AS IS" as set forth in the License.
 
 
-Vagrant::Config.run do |config|
+Vagrant.configure("2") do |config|
   
-  config.vm.box = "FlyScriptVM"
-  config.ssh.guest_port = 22
-  config.vm.customize ["modifyvm", :id, "--memory", 512]
-  config.vm.forward_port 80, 30080
-  config.vm.forward_port 8000, 38000
-  config.vm.forward_port 8888, 38888
+  config.vm.box = "FlyScriptAnsibleVM"
+  config.vm.box_url = "http://files.vagrantup.com/precise32.box"
 
-   config.vm.provision :puppet do |puppet|
-     puppet.manifests_path = "manifests"
-     puppet.manifest_file  = "init.pp"
-     puppet.module_path = "modules"
-     puppet.options = "--verbose --debug"
-     # Uncomment the following line and update proxy values if behind a proxy
-     #puppet.options = "--verbose --debug --http_proxy_host=<proxy_host> --http_proxy_port=<proxy_port>"
+  config.ssh.guest_port = 22
+
+  config.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--memory", 512]
+  end
+
+  # setup ip to match ansible_hosts file
+  config.vm.network :private_network, ip: "192.168.111.222"
+  config.vm.network :forwarded_port, guest:80, host: 30080
+  config.vm.network :forwarded_port, guest:8000, host: 38000
+  config.vm.network :forwarded_port, guest:8888, host: 38888
+
+   config.vm.provision :ansible do |ansible|
+       ansible.sudo = true
+       ansible.playbook = "provisioning/playbook.yml"
+       ansible.inventory_file = "provisioning/ansible_hosts"
+
+       ansible.verbose = true
    end
    
 end

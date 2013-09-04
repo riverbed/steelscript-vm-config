@@ -1,0 +1,70 @@
+---
+- hosts: vagrant
+  tasks:
+      - name: install core system packages
+        apt: pkg={{ item }} update_cache=yes state=present
+        with_items:
+            - build-essential
+            - git-core
+            - vim
+
+      - name: install core networking packages
+        apt: pkg={{ item }} update_cache=yes state=present
+        with_items:
+             - snmp
+             - snmpd 
+             - curl
+             - wget
+             - wireshark
+             - tshark
+
+      - name: install core python packages
+        apt: pkg={{ item }} update_cache=no state=present
+        with_items:
+            - python
+            - python-setuptools
+            - python-dev
+            - python-pip
+            - sqlite3
+            - python-matplotlib
+            - python-imaging
+            - python-numpy
+            - python-scipy
+            - python-pandas
+            - ipython-notebook
+            - python-nose
+
+      - name: install web servers
+        apt: pkg={{ item }} update_cache=no state=present
+        with_items:
+             - apache2
+             - libapache2-mod-wsgi
+
+      - name: install python virtualenv packages
+        pip: name={{ item }}
+        with_items:
+             - virtualenv
+             - virtualenvwrapper
+
+      - name: install python web framework support
+        pip: name={{ item }}
+        with_items:
+             - django
+             - djangorestframework
+             - django-model-utils
+             - django-extensions
+             - markdown
+             - pygeoip
+             - pysnmp
+             - flask
+
+      # packages that have specific version requirements
+      - name: install ipython specific python package version
+        pip: name=ipython version=1.0
+
+      - name: install pandas specific python package version
+        pip: name=pandas version=0.10.1
+
+      - name: install jsonfield specific python package version
+        pip: name=jsonfield version=0.9.5
+

@@ -68,3 +68,104 @@
       - name: install jsonfield specific python package version
         pip: name=jsonfield version=0.9.5
 
+      #
+      # install flyscript
+      #
+      - name: install flyscript sdk
+        pip: name=flyscript
+
+      #
+      # setup flyscript directories and templates
+      #
+      - name: flyscript root directory
+        file: path=/flyscript
+            state=directory mode=775
+
+      - name: flyscript wsgi directory
+        file: path=/flyscript/wsgi 
+            state=directory mode=775
+
+      - name: flyscript portal directory
+        file: path=/flyscript/flyscript_portal
+            state=directory mode=775 
+            owner=www-data group=www-data
+            recurse=yes
+        notify: 
+        - portal github checkout
+
+      #
+      # setup apache config
+      #
+      - name: flyscript site template
+        template: src=templates/flyscript_portal_site.j2
+            dest=/etc/apache2/sites-available/flyscript_portal_site
+            mode=664
+            owner=www-data group=www-data
+
+      - name: enable flyscript site
+        file: path=/etc/apache2/sites-enabled/001-flyscript_portal_site
+            src=/etc/apache2/sites-available/flyscript_portal_site
+            state=link
+            mode=664
+            owner=www-data group=www-data
+        notify:
+        - restart apache
+
+      - name: disable default site
+        file: path=/etc/apache2/sites-enabled/000-default state=absent
+
+      - name: install portal wsgi configuration
+        template: src=templates/flyscript_portal.wsgi
+            dest=/flyscript/wsgi/flyscript_portal.wsgi
+            mode=664
+            owner=www-data group=www-data
+
+      - name: setup www directory
+        file: path=/var/www
+            state=directory
+            owner=www-data group=www-data
+            recurse=yes
+
+
+  handlers:
+      ## Portal Handlers
+      #
+      - name: portal github checkout
+        git: repo=git://github.com/riverbed/flyscript-portal.git
+            dest=/flyscript/flyscript_portal
+            update=no
+        notify:
+        - portal syncdb
+
+      - name: portal syncdb
+        command: python manage.py syncdb --noinput 
+            chdir=/flyscript/flyscript_portal
+            creates=/flyscript/flyscript_portal/project.db
+        notify:
+        - portal static files
+
+      - name: portal static files
+        command: python manage.py collectstatic --noinput 
+            chdir=/flyscript/flyscript_portal
+            creates=/flyscript/flyscript_portal/static/bootstrap
+        notify:
+        - portal reload
+
+      - name: portal reload
+        command: python manage.py reload
+            chdir=/flyscript/flyscript_portal
+        notify:
+        - ensure portal permissions updated
+
+      - name: ensure portal permissions updated
+        file: path=/flyscript/flyscript_portal
+            state=directory
+            owner=www-data group=www-data
+            recurse=yes
+        notify:
+        - restart apache
+
+      - name: restart apache
+        service: name=apache2 state=restarted
+
+

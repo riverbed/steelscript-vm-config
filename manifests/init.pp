@@ -152,7 +152,7 @@ class flyscript_portal {
     exec {
       'portal_checkout':
         cwd => '/flyscript',
-        command => 'git clone git://github.com/riverbed/flyscript-portal.git flyscript_portal',
+        command => 'git clone https://github.com/riverbed/flyscript-portal.git flyscript_portal',
         path => '/usr/local/bin:/usr/bin:/bin',
         creates => '/flyscript/flyscript_portal/.git',
         require => Package[ "django", "djangorestframework", "markdown", "django-model-utils", 

@@ -3,11 +3,13 @@
 # forth at https://github.com/riverbed/flyscript-vm-config/blob/master/LICENSE
 # ("License").  This software is distributed "AS IS" as set forth in the License.
 
+WSGISocketPrefix /var/run/wsgi
+WSGIPythonHome /flyscript/virtualenv
+
 <VirtualHost *:80>
-	#DocumentRoot /usr/local/share/wsgi/mysite/media
+    WSGIPassAuthorization On
 	Alias /static /flyscript/flyscript_portal/static
 	WSGIScriptAlias / /flyscript/wsgi/flyscript_portal.wsgi
 	WSGIDaemonProcess flyscript_portal processes=2
 	WSGIProcessGroup flyscript_portal
-  #WSGIPythonPath /flyscript/wsgi:/flyscript/flyscript_portal
 </VirtualHost>

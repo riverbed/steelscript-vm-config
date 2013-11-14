@@ -16,15 +16,14 @@ Vagrant.configure("2") do |config|
   end
 
   # setup ip to match ansible_hosts file
-  config.vm.network :private_network, ip: "192.168.111.222"
+  #config.vm.network :private_network, ip: "192.168.111.222"
   config.vm.network :forwarded_port, guest:80, host: 30080
   config.vm.network :forwarded_port, guest:8000, host: 38000
   config.vm.network :forwarded_port, guest:8888, host: 38888
 
    config.vm.provision :ansible do |ansible|
        ansible.sudo = true
-       ansible.playbook = "provisioning/playbook.yml"
-       ansible.inventory_file = "provisioning/ansible_hosts"
+       ansible.playbook = "provisioning/provision.yml"
 
        ansible.verbose = true
    end

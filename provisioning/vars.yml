@@ -1,0 +1,45 @@
+---
+project_name: flyscript_portal
+project_root: /flyscript
+project_repo: https://github.com/riverbed/flyscript-portal.git
+project_owner: www-data
+project_group: www-data
+virtualenv: ${project_root}/virtualenv
+
+system_packages:
+    # core packages
+    - build-essential
+    - git-core
+    - vim
+    - tig
+    - emacs
+    - python-keyczar
+    # networking packages
+    - snmp
+    - snmpd
+    - curl
+    - wget
+    - wireshark
+    - tshark
+    # python packages
+    - python
+    - python-setuptools
+    - python-dev
+    - python-pip
+    - sqlite3
+    - python-matplotlib
+    - python-imaging
+    - ipython-notebook
+    - python-nose
+    # web server packages
+    - apache2
+    - libapache2-mod-wsgi
+
+python_packages:
+    - pip
+    - virtualenv
+    #- virtualenvwrapper
+    - ipython
+    - pysnmp
+
+

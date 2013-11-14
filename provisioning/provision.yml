@@ -1,0 +1,99 @@
+---
+- hosts: all
+  accelerate: false
+  sudo: yes
+  gather_facts: false
+  vars_files:
+      - vars.yml
+
+  tasks:
+      - name: install core system, networking, and python packages
+        apt: pkg={{ item }} update_cache=yes state=present
+        with_items: ${system_packages}
+
+      - name: install python system packages
+        easy_install: name={{item}}
+        with_items: ${python_packages}
+
+      #
+      # setup development flyscript directories and templates
+      #
+      - name: flyscript root directory
+        file: path=${project_root}
+            state=directory mode=775
+            owner=${project_owner} group=${project_group}
+
+      - name: flyscript wsgi directory
+        file: path=${project_root}/wsgi
+            state=directory mode=775
+
+      - name: flyscript portal directory
+        file: path=${project_root}/${project_name}
+            state=directory mode=775 
+            owner=${project_owner} group=${project_group}
+          
+      - name: flyscript tools directory
+        file: path=${project_root}/tools
+            state=directory mode=775 
+            owner=root group=root
+
+      #
+      # utility files
+      #
+      - name: flyscript site template
+        template: src=templates/update_flyscript.sh
+            dest=${project_root}/tools/update_flyscript.sh
+            mode=775
+            owner=root group=root
+
+      - name: flyscript helper functions and aliases
+        template: src=templates/vm_env.sh
+            dest=/flyscript/tools/vm_env.sh
+            mode=775
+            owner=root group=root
+
+      - name: update bashrc to source vm_env.sh
+        lineinfile: 
+            dest=/home/vagrant/.bashrc
+            line="source ${project_root}/tools/vm_env.sh"
+            regexp="^source ${project_root}/tools/vm_env.sh$"
+            insertafter=EOF
+            state=present
+
+      #
+      # setup apache config
+      #
+      - name: flyscript site template
+        template: src=templates/flyscript_portal_site.j2
+            dest=/etc/apache2/sites-available/flyscript_portal_site
+            mode=664
+            owner=${project_owner} group=${project_group}
+        notify:
+        - restart apache
+
+      - name: enable flyscript site
+        file: path=/etc/apache2/sites-enabled/001-flyscript_portal_site
+            src=/etc/apache2/sites-available/flyscript_portal_site
+            state=link
+            mode=664
+            owner=${project_owner} group=${project_group}
+        notify:
+        - restart apache
+
+      - name: disable default site
+        file: path=/etc/apache2/sites-enabled/000-default state=absent
+
+      - name: install portal wsgi configuration
+        template: src=templates/flyscript_portal.wsgi
+            dest=${project_root}/wsgi/flyscript_portal.wsgi
+            mode=664
+            owner=${project_owner} group=${project_group}
+        notify:
+        - restart apache
+
+  handlers:
+      - include: handlers.yml
+
+- include: deploy.yml
+
+

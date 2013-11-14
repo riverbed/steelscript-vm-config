@@ -1,0 +1,25 @@
+---
+- hosts: all
+  accelerate: false
+  sudo: yes
+  gather_facts: false
+  vars_files:
+      - vars.yml
+
+  tasks:
+      - name: portal github checkout
+        git: repo=${project_repo}
+           dest=${project_root}/${project_name}
+           update=yes
+        notify:
+        - portal static directory
+        - update virtualenv
+        - portal syncdb
+        - portal static files
+        - clear pyc files
+        - portal reload
+        - ensure correct portal ownership
+        - restart apache
+
+  handlers: 
+      - include: handlers.yml

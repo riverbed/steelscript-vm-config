@@ -1,0 +1,39 @@
+---
+- name: restart apache
+  service: name=apache2 state=restarted
+
+#
+# Portal deployment handlers
+#
+
+
+- name: portal static directory
+  file: path=${project_root}/${project_name}/static
+      state=directory mode=775 
+      owner=${project_owner} group=${project_group}
+
+- name: update virtualenv
+  pip: requirements=${project_root}/${project_name}/requirements.txt
+      virtualenv=${virtualenv}
+
+- name: portal syncdb
+  command: ${virtualenv}/bin/python manage.py syncdb --noinput 
+      chdir=${project_root}/${project_name}
+
+- name: portal static files
+  command: ${virtualenv}/bin/python manage.py collectstatic --clear --noinput 
+      chdir=${project_root}/${project_name}
+
+- name: clear pyc files
+  command: ${virtualenv}/bin/python manage.py clean_pyc --path .
+      chdir=${project_root}/${project_name}
+
+- name: portal reload
+  command: ${virtualenv}/bin/python manage.py reload
+      chdir=/flyscript/flyscript_portal
+
+- name: ensure correct portal ownership
+  file: path=/flyscript/flyscript_portal
+      state=directory
+      owner=${project_owner} group=${project_group}
+      recurse=yes

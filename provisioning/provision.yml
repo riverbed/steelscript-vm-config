@@ -65,7 +65,7 @@
             owner=${project_owner_deploy} group=${project_group_deploy}
 
       #
-      # setup enviroment for aliases and helper functions
+      # setup enviroment for aliases, helper functions, and ipython notebooks
       #
       - name: flyscript helper functions and aliases
         template: src=templates/vm_env.sh
@@ -80,6 +80,11 @@
             regexp="^source ${project_root_stage}/tools/vm_env.sh$"
             insertafter=EOF
             state=present
+
+      - name: ipython notebook folder
+        file: path=/home/vagrant/ipython_notebooks
+            state=directory mode=775
+            owner=vagrant group=vagrant
 
       #
       # setup apache config

@@ -20,12 +20,6 @@
 - name: update virtualenv
   pip: requirements=${project_root}/${project_name}/requirements.txt
       virtualenv=${virtualenv}
-  notify: synchronize virtualenv to deployment
-
-# only sync one time to save compile times
-- name: synchronize virtualenv to deployment
-  command: rsync -a ${virtualenv_stage}/ ${virtualenv_deploy}
-      creates=${virtualenv_deploy}
 
 - name: portal syncdb
   command: ${virtualenv}/bin/python manage.py syncdb --noinput 

@@ -18,14 +18,21 @@ fi
 
 export PORTAL_LOG=/var/www/flyscript_portal/log.txt
 
+export PORTAL_STAGE_DIR=/flyscript/flyscript_portal
+export PORTAL_STAGE_VENV=/flyscript/virtualenv
+export PORTAL_DEPLOY_DIR=/var/www/flyscript_portal
+export PORTAL_DEPLOY_VENV=/var/www/virtualenv
+
 alias view_err_log='less $ERROR_LOG'
 alias view_access_log='less $ACCESS_LOG'
 alias view_portal_log='less $PORTAL_LOG'
 
-alias cdportal='cd /flyscript/flyscript_portal'
-alias cdwww='cd /var/www/flyscript_portal'
+alias cdportal='cd $PORTAL_STAGE_DIR'
+alias cdwww='cd $PORTAL_DEPLOY_DIR'
 alias cdshared='cd /vagrant'
 
+alias dev_server='$PORTAL_STAGE_VENV/bin/python $PORTAL_STAGE_DIR/manage.py runserver `facter ipaddress`:8000'
+alias run_ipython_notebook='cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --pylab=inline'
 
 #
 # Pull changes from github to local staging area
@@ -47,29 +54,19 @@ deploy() {
     cd -
 }
 
-
-clean_pycs() {
-    # remove all pyc files
-    echo -n "Cleaning up all .pyc files ... "
-    cdportal
-    sudo python manage.py clean_pyc --path .
-    cd -
-    echo "done."
-}
-
 clean_perms() {
-    # update all perms correctly
+    # update all perms correctly in staging dir
     echo -n "Updating Portal ownership ... "
     cdportal
-    sudo chown -R $USERGROUP:$USERGROUP *
+    sudo chown -R vagrant:vagrant *
     cd -
     echo "done."
 }
 
 collect_logs() {
     echo -n "Collecting all log files and generating zipfile ... "
-    cdportal
-    sudo python manage.py collect_logs &> /dev/null
+    cdwww
+    sudo $PORTAL_DEPLOY_VENV/bin/python manage.py collect_logs &> /dev/null
     LOGFILE=`ls -tr1 | grep debug | tail -1`
 
     if [[ -e /vagrant ]]; then

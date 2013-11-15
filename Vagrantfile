@@ -12,6 +12,7 @@ Vagrant.configure("2") do |config|
   config.ssh.guest_port = 22
 
   config.vm.provider :virtualbox do |vb|
+      vb.customize ["modifyvm", :id, "--cpus", 2]
       vb.customize ["modifyvm", :id, "--memory", 512]
   end
 

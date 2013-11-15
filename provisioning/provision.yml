@@ -4,7 +4,7 @@
   sudo: yes
   gather_facts: false
   vars_files:
-      - vars.yml
+      - vars_common.yml
 
   tasks:
       - name: install core system, networking, and python packages
@@ -16,47 +16,68 @@
         with_items: ${python_packages}
 
       #
+      # Setup vagrant keys and ansible
+      #
+      - name: install vagrant public key
+        copy: src=keys/vagrant.pub
+              dest=/home/vagrant/.ssh/id_rsa.pub
+              owner=vagrant group=vagrant mode=644
+
+      - name: install vagrant private key
+        copy: src=keys/vagrant
+              dest=/home/vagrant/.ssh/id_rsa
+              owner=vagrant group=vagrant mode=600
+
+      # ansible cannot be easy_install'ed
+      - name: install ansible
+        pip: name=ansible 
+
+      #
       # setup development flyscript directories and templates
       #
       - name: flyscript root directory
-        file: path=${project_root}
+        file: path=${project_root_stage}
             state=directory mode=775
-            owner=${project_owner} group=${project_group}
+            owner=${project_owner_stage} group=${project_group_stage}
 
-      - name: flyscript wsgi directory
-        file: path=${project_root}/wsgi
-            state=directory mode=775
 
       - name: flyscript portal directory
-        file: path=${project_root}/${project_name}
+        file: path=${project_root_stage}/${project_name}
             state=directory mode=775 
-            owner=${project_owner} group=${project_group}
+            owner=${project_owner_stage} group=${project_group_stage}
           
       - name: flyscript tools directory
-        file: path=${project_root}/tools
+        file: path=/flyscript/tools
             state=directory mode=775 
             owner=root group=root
 
       #
-      # utility files
+      # setup deployment flyscript directories
       #
-      - name: flyscript site template
-        template: src=templates/update_flyscript.sh
-            dest=${project_root}/tools/update_flyscript.sh
-            mode=775
-            owner=root group=root
+      - name: flyscript wsgi directory
+        file: path=${project_root_deploy}/wsgi
+            state=directory mode=775
+            owner=${project_owner_deploy} group=${project_group_deploy}
 
+      - name: flyscript home directory
+        file: path=${project_root_deploy}/.flyscript
+            state=directory mode=775
+            owner=${project_owner_deploy} group=${project_group_deploy}
+
+      #
+      # setup enviroment for aliases and helper functions
+      #
       - name: flyscript helper functions and aliases
         template: src=templates/vm_env.sh
-            dest=/flyscript/tools/vm_env.sh
+            dest=${project_root_stage}/tools/vm_env.sh
             mode=775
             owner=root group=root
 
       - name: update bashrc to source vm_env.sh
         lineinfile: 
             dest=/home/vagrant/.bashrc
-            line="source ${project_root}/tools/vm_env.sh"
-            regexp="^source ${project_root}/tools/vm_env.sh$"
+            line="source ${project_root_stage}/tools/vm_env.sh"
+            regexp="^source ${project_root_stage}/tools/vm_env.sh$"
             insertafter=EOF
             state=present
 
@@ -67,7 +88,7 @@
         template: src=templates/flyscript_portal_site.j2
             dest=/etc/apache2/sites-available/flyscript_portal_site
             mode=664
-            owner=${project_owner} group=${project_group}
+            owner=${project_owner_deploy} group=${project_group_deploy}
         notify:
         - restart apache
 
@@ -76,7 +97,7 @@
             src=/etc/apache2/sites-available/flyscript_portal_site
             state=link
             mode=664
-            owner=${project_owner} group=${project_group}
+            owner=${project_owner_deploy} group=${project_group_deploy}
         notify:
         - restart apache
 
@@ -85,15 +106,16 @@
 
       - name: install portal wsgi configuration
         template: src=templates/flyscript_portal.wsgi
-            dest=${project_root}/wsgi/flyscript_portal.wsgi
+            dest=${project_root_deploy}/wsgi/flyscript_portal.wsgi
             mode=664
-            owner=${project_owner} group=${project_group}
+            owner=${project_owner_deploy} group=${project_group_deploy}
         notify:
         - restart apache
+
+      - meta: flush_handlers
 
   handlers:
       - include: handlers.yml
 
+- include: stage.yml
 - include: deploy.yml
-
-

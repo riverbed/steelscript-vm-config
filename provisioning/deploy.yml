@@ -1,18 +1,40 @@
 ---
-- hosts: all
+- name: deploy from stage to apache
+  hosts: all
   accelerate: false
   sudo: yes
   gather_facts: false
   vars_files:
-      - vars.yml
+      - vars_common.yml
+  vars:
+    project_root: ${project_root_deploy}
+    project_name: ${project_name}
+    project_repo: ${project_repo_deploy}
+    project_owner: ${project_owner_deploy}
+    project_group: ${project_group_deploy}
+    virtualenv: ${virtualenv_deploy}
+
 
   tasks:
-      - name: portal github checkout
-        git: repo=${project_repo}
-           dest=${project_root}/${project_name}
-           update=yes
+      - name: synchronize stage to deployment folder
+        command: rsync -a --delete ${project_repo}/{{ item }} ${project_root}/${project_name}
+
+        with_items:
+        - apps
+        - clean
+        - config
+        - initial_data.json
+        - libs
+        - manage.py
+        - media
+        - project
+        - templates
+        - thirdparty
+        - requirements.txt
+
         notify:
         - portal static directory
+        - portal datacache directory
         - update virtualenv
         - portal syncdb
         - portal static files
@@ -20,6 +42,8 @@
         - portal reload
         - ensure correct portal ownership
         - restart apache
+
+      - meta: flush_handlers
 
   handlers: 
       - include: handlers.yml

@@ -16,20 +16,44 @@ else
 fi
 
 
-export PORTAL_LOG=/flyscript/flyscript_portal/log.txt
+export PORTAL_LOG=/var/www/flyscript_portal/log.txt
 
 alias view_err_log='less $ERROR_LOG'
 alias view_access_log='less $ACCESS_LOG'
 alias view_portal_log='less $PORTAL_LOG'
 
 alias cdportal='cd /flyscript/flyscript_portal'
+alias cdwww='cd /var/www/flyscript_portal'
 alias cdshared='cd /vagrant'
+
+
+#
+# Pull changes from github to local staging area
+#
+update_portal() {
+    echo "Pulling latest changes from github ..."
+    cd /vagrant/provisioning
+    ansible-playbook -i ansible_hosts stage.yml
+    cd -
+}
+
+#
+# Push changes from staging area to apache
+#
+deploy() {
+    echo "Deploying files ..."
+    cd /vagrant/provisioning
+    ansible-playbook -i ansible_hosts deploy.yml
+    cd -
+}
+
 
 clean_pycs() {
     # remove all pyc files
     echo -n "Cleaning up all .pyc files ... "
     cdportal
     sudo python manage.py clean_pyc --path .
+    cd -
     echo "done."
 }
 
@@ -38,6 +62,7 @@ clean_perms() {
     echo -n "Updating Portal ownership ... "
     cdportal
     sudo chown -R $USERGROUP:$USERGROUP *
+    cd -
     echo "done."
 }
 
@@ -54,6 +79,7 @@ collect_logs() {
     fi
 
     tar czf $ZIPFILE $LOGFILE $ERROR_LOG $ACCESS_LOG $PORTAL_LOG
+    cd -
     echo "done."
     echo "Zip file has been stored here: $ZIPFILE"
     if [[ -e /vagrant ]]; then

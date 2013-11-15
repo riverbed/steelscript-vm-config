@@ -8,8 +8,8 @@ import os
 import sys
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'project.settings'
-os.environ['HOME'] = '/flyscript'
-sys.path.append('/flyscript/flyscript_portal')
+os.environ['HOME'] = '${project_root_deploy}'
+sys.path.append('${project_root_deploy}/${project_name}')
 
 import django.core.handlers.wsgi
 application = django.core.handlers.wsgi.WSGIHandler()

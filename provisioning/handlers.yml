@@ -12,9 +12,20 @@
       state=directory mode=775 
       owner=${project_owner} group=${project_group}
 
+- name: portal datacache directory
+  file: path=${project_root}/${project_name}/datacache
+      state=directory mode=775 
+      owner=${project_owner} group=${project_group}
+
 - name: update virtualenv
   pip: requirements=${project_root}/${project_name}/requirements.txt
       virtualenv=${virtualenv}
+  notify: synchronize virtualenv to deployment
+
+# only sync one time to save compile times
+- name: synchronize virtualenv to deployment
+  command: rsync -a ${virtualenv_stage}/ ${virtualenv_deploy}
+      creates=${virtualenv_deploy}
 
 - name: portal syncdb
   command: ${virtualenv}/bin/python manage.py syncdb --noinput 
@@ -30,10 +41,10 @@
 
 - name: portal reload
   command: ${virtualenv}/bin/python manage.py reload
-      chdir=/flyscript/flyscript_portal
+      chdir=${project_root}/${project_name}
 
 - name: ensure correct portal ownership
-  file: path=/flyscript/flyscript_portal
+  file: path=${project_root}/${project_name}
       state=directory
       owner=${project_owner} group=${project_group}
       recurse=yes

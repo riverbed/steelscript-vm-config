@@ -57,7 +57,7 @@ push the changes and update the server instance.
 
 A summary of included aliases and commands:
 
-Aliases          |  Description                                                            |
+Aliases / Functions |  Description                                                            |
 -----------------|:------------------------------------------------------------------------|
 `view_err_log`   |  show the apache error log
 `view_access_log`|  show the apache access log
@@ -68,9 +68,6 @@ Aliases          |  Description                                                 
                  |  This can be a convenient way to share files between the guest and host.
 `run_ipython_notebooks` | shortcut to run ipython notebook server (documented below) |
 `dev_server` | shortcut to run the django development server in the staging directory |
-
-Helper Funcs     |  Description                                                            |
------------------|:------------------------------------------------------------------------|
 `update_portal`  | pull the latest changes from github and merge them into the 
                  | staging directory.  If you have made changes already, you may need
                  | to run `git stash` before this command.  After it completes, run `git pop` 

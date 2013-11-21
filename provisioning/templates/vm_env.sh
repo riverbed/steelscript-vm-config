@@ -1,19 +1,9 @@
 #!/usr/bin/sh
 
-# make a good guess what type of system we are on
-if [[ -e /var/log/apache2 ]]; then
-    # e.g. RHEL, CentOS, Fedora, Scientific Linux, etc.
-    LOGDIR=/var/log/apache2
-    export ERROR_LOG=$LOGDIR/error.log
-    export ACCESS_LOG=$LOGDIR/access.log
-    USERGROUP=www-data
-else
-    # e.g. Debian, Ubuntu, etc.
-    LOGDIR=/var/log/httpd
-    export ERROR_LOG=$LOGDIR/error_log
-    export ACCESS_LOG=$LOGDIR/access_log
-    USERGROUP=apache
-fi
+LOGDIR=/var/log/apache2
+export ERROR_LOG=$LOGDIR/error.log
+export ACCESS_LOG=$LOGDIR/other_vhosts_access.log
+USERGROUP=www-data
 
 
 export PORTAL_LOG=/var/www/flyscript_portal/log.txt
@@ -34,13 +24,22 @@ alias cdshared='cd /vagrant'
 alias dev_server='$PORTAL_STAGE_VENV/bin/python $PORTAL_STAGE_DIR/manage.py runserver `facter ipaddress`:8000'
 alias run_ipython_notebook='cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --pylab=inline'
 
+alias virtualenv_dev='deactivate &>/dev/null; source $PORTAL_STAGE_VENV/bin/activate'
+alias virtualenv_www='deactivate &>/dev/null; source $PORTAL_DEPLOY_VENV/bin/activate'
+
+rotate_logs() {
+    echo -n "Rotating apache logs ... "
+    sudo logrotate -f /etc/logrotate.d/apache2
+    echo "done."
+}
+
 #
 # Pull changes from github to local staging area
 #
 update_portal() {
     echo "Pulling latest changes from github ..."
     cd /vagrant/provisioning
-    ansible-playbook -i ansible_hosts stage.yml
+    ansible-playbook -i ansible_hosts -c local stage.yml
     cd -
 }
 
@@ -48,9 +47,10 @@ update_portal() {
 # Push changes from staging area to apache
 #
 deploy() {
+    rotate_logs
     echo "Deploying files ..."
     cd /vagrant/provisioning
-    ansible-playbook -i ansible_hosts deploy.yml
+    ansible-playbook -i ansible_hosts -c local deploy.yml
     cd -
 }
 

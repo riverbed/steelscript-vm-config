@@ -5,13 +5,13 @@ project_root_stage: /flyscript
 project_repo_stage: https://github.com/riverbed/flyscript-portal.git
 project_owner_stage: vagrant
 project_group_stage: vagrant
-virtualenv_stage: ${project_root_stage}/virtualenv
+virtualenv_stage: "{{ project_root_stage }}/virtualenv"
 
 project_root_deploy: /var/www
-project_repo_deploy: ${project_root_stage}/${project_name}
+project_repo_deploy: "{{ project_root_stage }}/{{ project_name }}"
 project_owner_deploy: www-data
 project_group_deploy: www-data
-virtualenv_deploy: ${project_root_deploy}/virtualenv
+virtualenv_deploy: "{{ project_root_deploy }}/virtualenv"
 
 system_packages:
     # core packages

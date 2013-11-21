@@ -4,12 +4,12 @@
 # ("License").  This software is distributed "AS IS" as set forth in the License.
 
 WSGISocketPrefix /var/run/wsgi
-WSGIPythonHome ${virtualenv_deploy}
+WSGIPythonHome {{ virtualenv_deploy }}
 
 <VirtualHost *:80>
     WSGIPassAuthorization On
-	Alias /static ${project_root_deploy}/${project_name}/static
-	WSGIScriptAlias / ${project_root_deploy}/wsgi/flyscript_portal.wsgi
-	WSGIDaemonProcess ${project_name} processes=2
-	WSGIProcessGroup ${project_name}
+    Alias /static {{ project_root_deploy }}/{{ project_name }}/static
+    WSGIScriptAlias / {{ project_root_deploy }}/wsgi/flyscript_portal.wsgi
+    WSGIDaemonProcess {{ project_name }} processes=2
+    WSGIProcessGroup {{ project_name }}
 </VirtualHost>

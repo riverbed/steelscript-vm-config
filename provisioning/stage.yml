@@ -1,5 +1,5 @@
 ---
-- name: pull from github to staging area
+- name: PULL FROM GITHUB TO STAGING AREA
   hosts: all
   accelerate: false
   sudo: yes
@@ -7,17 +7,17 @@
   vars_files:
       - vars_common.yml
   vars:
-    project_root: ${project_root_stage}
-    project_name: ${project_name}
-    project_repo: ${project_repo_stage}
-    project_owner: ${project_owner_stage}
-    project_group: ${project_group_stage}
-    virtualenv: ${virtualenv_stage}
+    project_root: "{{ project_root_stage }}"
+    project_name: "{{ project_name }}"
+    project_repo: "{{ project_repo_stage }}"
+    project_owner: "{{ project_owner_stage }}"
+    project_group: "{{ project_group_stage }}"
+    virtualenv: "{{ virtualenv_stage }}"
 
   tasks:
       - name: portal github checkout
-        git: repo=${project_repo}
-           dest=${project_root}/${project_name}
+        git: repo={{ project_repo }}
+           dest={{ project_root }}/{{ project_name }}
            update=yes
         notify:
         - portal static directory
@@ -26,7 +26,7 @@
         - portal static files
         - clear pyc files
         - portal reload
-        - ensure correct portal ownership
+        - ensure correct directory ownership
         - restart apache
 
       - meta: flush_handlers

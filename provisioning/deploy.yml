@@ -1,5 +1,5 @@
 ---
-- name: deploy from stage to apache
+- name: DEPLOY FROM STAGE TO APACHE
   hosts: all
   accelerate: false
   sudo: yes
@@ -7,17 +7,17 @@
   vars_files:
       - vars_common.yml
   vars:
-    project_root: ${project_root_deploy}
-    project_name: ${project_name}
-    project_repo: ${project_repo_deploy}
-    project_owner: ${project_owner_deploy}
-    project_group: ${project_group_deploy}
-    virtualenv: ${virtualenv_deploy}
-
+    project_root: "{{ project_root_deploy }}"
+    project_name: "{{ project_name }}"
+    project_repo: "{{ project_repo_deploy }}"
+    project_owner: "{{ project_owner_deploy }}"
+    project_group: "{{ project_group_deploy }}"
+    virtualenv: "{{ virtualenv_deploy }}"
 
   tasks:
       - name: synchronize stage to deployment folder
-        command: rsync -a --delete ${project_repo}/{{ item }} ${project_root}/${project_name}
+        command: >
+            rsync -a --delete {{ project_repo }}/{{ item }} {{ project_root }}/{{ project_name }}
 
         with_items:
         - apps

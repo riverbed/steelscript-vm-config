@@ -8,37 +8,47 @@
 
 
 - name: portal static directory
-  file: path=${project_root}/${project_name}/static
+  file: path={{ project_root }}/{{ project_name }}/static
       state=directory mode=775 
-      owner=${project_owner} group=${project_group}
+      owner={{ project_owner }} group={{ project_group }}
 
 - name: portal datacache directory
-  file: path=${project_root}/${project_name}/datacache
+  file: path={{ project_root }}/{{ project_name }}/datacache
       state=directory mode=775 
-      owner=${project_owner} group=${project_group}
+      owner={{ project_owner }} group={{ project_group }}
 
 - name: update virtualenv
-  pip: requirements=${project_root}/${project_name}/requirements.txt
-      virtualenv=${virtualenv}
+  pip: requirements={{ project_root }}/{{ project_name }}/requirements.txt
+      virtualenv={{ virtualenv }}
 
 - name: portal syncdb
-  command: ${virtualenv}/bin/python manage.py syncdb --noinput 
-      chdir=${project_root}/${project_name}
+  django_manage: command=syncdb
+      app_path={{ project_root }}/{{ project_name }}
+      virtualenv={{ virtualenv }}
 
 - name: portal static files
-  command: ${virtualenv}/bin/python manage.py collectstatic --clear --noinput 
-      chdir=${project_root}/${project_name}
+  django_manage: command=collectstatic
+      app_path={{ project_root }}/{{ project_name }}
+      virtualenv={{ virtualenv }}
 
 - name: clear pyc files
-  command: ${virtualenv}/bin/python manage.py clean_pyc --path .
-      chdir=${project_root}/${project_name}
+  command: >
+      {{ virtualenv }}/bin/python manage.py clean_pyc --path .
+      chdir={{ project_root }}/{{ project_name }}
 
 - name: portal reload
-  command: ${virtualenv}/bin/python manage.py reload
-      chdir=${project_root}/${project_name}
+  command: >
+      {{ virtualenv }}/bin/python manage.py reload
+      chdir={{ project_root }}/{{ project_name }}
 
 - name: ensure correct portal ownership
-  file: path=${project_root}/${project_name}
+  file: path={{ project_root }}/{{ project_name }}
       state=directory
-      owner=${project_owner} group=${project_group}
+      owner={{ project_owner }} group={{ project_group }}
+      recurse=yes
+
+- name: ensure correct directory ownership
+  file: path={{ project_root }}
+      state=directory
+      owner={{ project_owner }} group={{ project_group }}
       recurse=yes

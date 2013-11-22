@@ -38,4 +38,4 @@
         - thirdparty
         - requirements.txt
 
-- include: deploy.yml
+- include: deploy.yml project_repo=/home/vagrant/sync/flyscript_portal

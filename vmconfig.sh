@@ -49,6 +49,12 @@ update() {
 }
 
 help() {
+    echo 'This script provides convenience functions to update the Vagrant VM '
+    echo 'without logging into the machine.'
+    echo 'Additionally, when using the "deploy -r <local_directory>" option'
+    echo 'a local copy of the flyscript_portal can be used as the deployment source'
+    echo 'so you can perform all of your development in your local environment.'
+    echo ''
     echo 'Available commands:'
     echo '  deploy [-h] [-r <local_directory>]'
     echo '  update'

@@ -1,12 +1,7 @@
 ---
-- name: restart apache
-  service: name=apache2 state=restarted
-
 #
 # Portal deployment handlers
 #
-
-
 - name: portal static directory
   file: path={{ project_root }}/{{ project_name }}/static
       state=directory mode=775 
@@ -52,3 +47,11 @@
       state=directory
       owner={{ project_owner }} group={{ project_group }}
       recurse=yes
+
+
+#
+# Service handlers
+#
+- name: restart apache
+  service: name=apache2 state=restarted
+

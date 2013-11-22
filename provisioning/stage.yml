@@ -13,12 +13,14 @@
     project_owner: "{{ project_owner_stage }}"
     project_group: "{{ project_group_stage }}"
     virtualenv: "{{ virtualenv_stage }}"
+    force_checkout: no
 
   tasks:
       - name: portal github checkout
         git: repo={{ project_repo }}
            dest={{ project_root }}/{{ project_name }}
            update=yes
+           force={{ force_checkout }}
         notify:
         - portal static directory
         - update virtualenv

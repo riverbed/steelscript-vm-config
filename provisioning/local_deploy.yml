@@ -1,0 +1,41 @@
+---
+- name: DEPLOY FROM HOST MACHINE TO APACHE
+  hosts: all
+  accelerate: false
+  sudo: no
+  gather_facts: false
+  vars_files:
+      - vars_common.yml
+  vars:
+    local_dir: ""
+    ssh_options: "ssh -p 2222 -i {{ local_dir }}provisioning/keys/vagrant -l vagrant -o PasswordAuthentication=no"
+    rsync_guest_dir: "/home/vagrant/sync"
+    rsync_dest_prefix: "vagrant@127.0.0.1:{{ rsync_guest_dir }}"
+    rsync_dest: "{{ rsync_dest_prefix }}/{{ project_name }}"
+    rsync_source: ""
+
+  tasks:
+      - name: sync directory setup
+        file: path={{ rsync_guest_dir }}
+            state=directory mode=775
+            owner=vagrant group=vagrant
+
+      - name: synchronize local directory to guest machine
+        local_action: >
+            command rsync -a --delete -e "{{ ssh_options }}" {{ rsync_source }}/{{ item }} {{ rsync_dest }}
+        when: rsync_source != ""
+
+        with_items:
+        - apps
+        - clean
+        - config
+        - initial_data.json
+        - libs
+        - manage.py
+        - media
+        - project
+        - templates
+        - thirdparty
+        - requirements.txt
+
+- include: deploy.yml

@@ -78,15 +78,15 @@
       #
       - name: flyscript site template
         template: src=templates/flyscript_portal_site.j2
-            dest=/etc/apache2/sites-available/flyscript_portal_site
+            dest=/etc/apache2/sites-available/flyscript_portal
             mode=664
             owner={{ project_owner_deploy }} group={{ project_group_deploy }}
         notify:
         - restart apache
 
       - name: enable flyscript site
-        file: path=/etc/apache2/sites-enabled/001-flyscript_portal_site
-            src=/etc/apache2/sites-available/flyscript_portal_site
+        file: path=/etc/apache2/sites-enabled/001-flyscript_portal
+            src=/etc/apache2/sites-available/flyscript_portal
             state=link
             mode=664
             owner={{ project_owner_deploy }} group={{ project_group_deploy }}

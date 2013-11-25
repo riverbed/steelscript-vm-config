@@ -62,7 +62,7 @@ help() {
 }
 
 
-if [[ $1 =~ ^(deploy|update|help)$ ]]; then
+if [[ $1 == "deploy" || $1 == "update" || $1 == "help" ]]; then
   "$@"
 else
   echo "Invalid subcommand $1" >&2

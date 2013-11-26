@@ -10,23 +10,40 @@ Command-line Python Development Environment with FlyScript
 * [Vagrant](http://www.vagrantup.com/) - version 1.3.5 or later
 * [Ansible](http://www.ansibleworks.com) - version 1.3.4 or later
 * [git](http://git-scm.com/downloads)
-or one of the Github GUI clients: [OSX](http://mac.github.com/), [Windows] (http://windows.github.com/), [Eclipse](http://eclipse.github.com/)
 
-        Clone this repo: $ git clone git@github.com:riverbed/flyscript-vm.git
-        Or, using one of the Github GUI clients, click the button: Clone in {platform}
+Clone this repo: $ git clone https://github.com/riverbed/flyscript-vm-config.git
+Or, using one of the Github GUI clients, click the button: Clone in {platform}
 
-## BASIC USAGE
+## INSTALLATION
 
 1. Verify you have met the above requirements. Ansible is simply a python
    library, and can usually be installed via 'pip install ansible'.  The other
    packages require system-level installations.
-2. Provision a new Vagrant VM:
+
+   Windows users note: When using Windows as the host machine, you will need to
+   run the following commands from the Git Bash or Cygwin command shell.  Git Bash
+   should be included as part of the installation package in the [git](http://git-scm.com/downloads)
+   download.
+   
+2. Clone this repo via the following command, or using one of the Github GUI
+   clients, click the button: Clone in {platform}: 
+
+        $ git clone https://github.com/riverbed/flyscript-vm-config.git
+   
+3. Navigate into the new repo:
 
         $ cd flyscript-vm (Wherever your cloned path is for this repo)
+
+4. If using Windows, run the `vmconfig.bat` file in this directory.  This just copies
+   `Vagrantfile.win` to `Vagrantfile`.
+
+5. Provision a new Vagrant VM:
+
         $ vagrant up
 
-3. A fresh install will take between 10-20 minutes depending on your internet connection.
-4. Once completed, a fresh virtual machine will be waiting with FlyScript
+6. A fresh install will take between 10-20 minutes depending on your internet connection.
+
+7. Once completed, a new virtual machine will be waiting with FlyScript
    Portal and IPython Notebooks ready.
 
 

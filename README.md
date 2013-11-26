@@ -11,19 +11,19 @@ Command-line Python Development Environment with FlyScript
 * [Ansible](http://www.ansibleworks.com) - version 1.3.4 or later
 * [git](http://git-scm.com/downloads)
 
-Clone this repo: $ git clone https://github.com/riverbed/flyscript-vm-config.git
-Or, using one of the Github GUI clients, click the button: Clone in {platform}
-
 ## INSTALLATION
 
 1. Verify you have met the above requirements. Ansible is simply a python
    library, and can usually be installed via 'pip install ansible'.  The other
    packages require system-level installations.
 
-   Windows users note: When using Windows as the host machine, you will need to
-   run the following commands from the Git Bash or Cygwin command shell.  Git Bash
-   should be included as part of the installation package in the [git](http://git-scm.com/downloads)
-   download.
+   *Windows users note 1*: You will need to run the commands from the Git Bash
+   or Cygwin command shell.  Git Bash should be included as part of the
+   installation package in the [git](http://git-scm.com/downloads) download.
+
+   *Windows users note 2*: When using Windows as the host machine, the ansible package
+   is not yet fully supported and will fail when trying to `pip install` it. An extra
+   step is included in Step 4 to workaround this.
    
 2. Clone this repo via the following command, or using one of the Github GUI
    clients, click the button: Clone in {platform}: 

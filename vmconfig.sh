@@ -39,12 +39,14 @@ deploy() {
     if [[ $VERBOSE == 1 ]]; then
         echo "Command: $CMD"
     fi
+    chmod 600 provisioning/keys/vagrant
     exec $CMD
 }
 
 update() {
     echo 'Running update command ...'
     CMD="$BASE_CMD provisioning/stage.yml"
+    chmod 600 provisioning/keys/vagrant
     exec $CMD
 }
 

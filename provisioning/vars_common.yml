@@ -44,7 +44,7 @@ system_packages:
 
 python_packages:
     - pip
-    - virtualenv
+    # virtualenv
     - ipython
     - pysnmp
 

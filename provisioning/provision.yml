@@ -15,6 +15,9 @@
         easy_install: name={{item}}
         with_items: python_packages
 
+      - name: install virtualenv
+        pip: name=virtualenv version=1.10
+
       # ansible cannot be easy_install'ed
       - name: install ansible
         pip: name=ansible 

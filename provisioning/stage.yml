@@ -21,6 +21,7 @@
            dest={{ project_root }}/{{ project_name }}
            update=yes
            force={{ force_checkout }}
+           version=12c3d530943c4eda62efcbde43425b6b3c0d4c69
         notify:
         - portal static directory
         - update virtualenv

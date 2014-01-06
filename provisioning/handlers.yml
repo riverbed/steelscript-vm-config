@@ -16,6 +16,8 @@
   pip: requirements={{ project_root }}/{{ project_name }}/requirements.txt
       virtualenv={{ virtualenv }}
 
+# manual portal management
+#
 - name: portal syncdb
   django_manage: command=syncdb
       app_path={{ project_root }}/{{ project_name }}
@@ -34,6 +36,19 @@
 - name: portal reload
   command: >
       {{ virtualenv }}/bin/python manage.py reload
+      chdir={{ project_root }}/{{ project_name }}
+
+# automatic portal management
+#   deletes db and starts from scratch
+#   handles:
+#       syncdb
+#       clear pyc
+#       reload
+#       plus more
+#
+- name: portal reset
+  command: >
+      {{ virtualenv }}/bin/python manage.py reset_portal --force
       chdir={{ project_root }}/{{ project_name }}
 
 - name: ensure correct portal ownership

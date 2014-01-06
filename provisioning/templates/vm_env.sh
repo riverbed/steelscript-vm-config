@@ -63,6 +63,24 @@ portal_clean_perms() {
     echo "done."
 }
 
+portal_reset_dev() {
+    # run a clean --reset on the deployed directory
+    echo "Resetting development server configuration ..."
+    echo "Are you sure?"
+    select yn in "Yes" "No"; do
+        case $yn in
+            Yes ) break;;
+            No ) return;;
+        esac
+    done
+
+    virtualenv_dev
+    cdportal
+    sudo ./clean --reset --force
+    deactivate
+    cd -
+}
+
 portal_reset_www() {
     # run a clean --reset on the deployed directory
     echo "Resetting deployed server configuration ..."
@@ -76,7 +94,7 @@ portal_reset_www() {
 
     virtualenv_www
     cdwww
-    sudo ./clean --reset
+    sudo ./clean --reset --force
     deactivate
     cd -
 }

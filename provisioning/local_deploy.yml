@@ -29,7 +29,7 @@
         - apps
         - clean
         - config
-        - initial_data.json
+        - initial_data
         - libs
         - manage.py
         - media

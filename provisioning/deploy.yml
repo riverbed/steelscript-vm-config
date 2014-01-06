@@ -13,9 +13,12 @@
     project_owner: "{{ project_owner_deploy }}"
     project_group: "{{ project_group_deploy }}"
     virtualenv: "{{ virtualenv_deploy }}"
+    reset: false
 
   tasks:
-      - name: synchronize stage to deployment folder
+      - name: synchronize stage to deployment folder with reset
+        when: reset
+
         command: >
             rsync -a --delete {{ project_repo }}/{{ item }} {{ project_root }}/{{ project_name }}
 
@@ -23,7 +26,35 @@
         - apps
         - clean
         - config
-        - initial_data.json
+        - initial_data
+        - libs
+        - manage.py
+        - media
+        - project
+        - templates
+        - thirdparty
+        - requirements.txt
+
+        notify:
+        - portal static directory
+        - portal datacache directory
+        - update virtualenv
+        - portal static files
+        - portal reset
+        - ensure correct portal ownership
+        - restart apache
+
+      - name: synchronize stage to deployment folder without reset
+        when: not reset
+
+        command: >
+            rsync -a --delete {{ project_repo }}/{{ item }} {{ project_root }}/{{ project_name }}
+
+        with_items:
+        - apps
+        - clean
+        - config
+        - initial_data
         - libs
         - manage.py
         - media

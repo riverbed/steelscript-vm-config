@@ -112,5 +112,5 @@
   handlers:
       - include: handlers.yml
 
-- include: stage.yml
-- include: deploy.yml
+- include: stage.yml reset=true
+- include: deploy.yml reset=true

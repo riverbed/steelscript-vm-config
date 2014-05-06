@@ -7,8 +7,20 @@
       - vars_common.yml
 
   tasks:
+      # XXX ignore in final version?
+      - name: configure apt-cache
+        apt: pkg=squid-deb-proxy-client update_cache=yes cache_valid_time=3600
+            state=present
+
+      - name: start zeroconf service
+        service: name=avahi-daemon state=started
+
+      - name: upgrade base system
+        apt: upgrade=safe update_cache=yes
+
       - name: install core system, networking, and python packages
-        apt: pkg={{ item }} update_cache=yes state=present
+        apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
+            state=present
         with_items: system_packages
 
       - name: install python system packages
@@ -20,51 +32,38 @@
 
       # ansible cannot be easy_install'ed
       - name: install ansible
-        pip: name=ansible 
+        pip: name=ansible
 
       #
-      # setup development flyscript directories and templates
+      # setup development steelscript directories and templates
       #
-      - name: flyscript root directory
+      - name: steelscript root directory
         file: path={{ project_root_stage }}
             state=directory mode=775
             owner={{ project_owner_stage }} group={{ project_group_stage }}
 
-      - name: flyscript portal directory
+      - name: steelscript app framework directory
         file: path={{ project_root_stage }}/{{ project_name }}
-            state=directory mode=775 
+            state=directory mode=775
             owner={{ project_owner_stage }} group={{ project_group_stage }}
         register: portal_dir_result
-          
-      - name: flyscript tools directory
-        file: path=/flyscript/tools
-            state=directory mode=775 
+
+      - name: steelscript tools directory
+        file: path=/steelscript/tools
+            state=directory mode=775
             owner=root group=root
-
-      #
-      # setup deployment flyscript directories
-      #
-      - name: flyscript wsgi directory
-        file: path={{ project_root_deploy }}/wsgi
-            state=directory mode=775
-            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
-
-      - name: flyscript home directory
-        file: path={{ project_root_deploy }}/.flyscript
-            state=directory mode=775
-            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
 
       #
       # setup enviroment for aliases, helper functions, and ipython notebooks
       #
-      - name: flyscript helper functions and aliases
+      - name: steelscript helper functions and aliases
         template: src=templates/vm_env.sh
             dest={{ project_root_stage }}/tools/vm_env.sh
             mode=775
             owner=root group=root
 
       - name: update bashrc to source vm_env.sh
-        lineinfile: 
+        lineinfile:
             dest=/home/vagrant/.bashrc
             line="source {{ project_root_stage }}/tools/vm_env.sh"
             regexp="^source {{ project_root_stage }}/tools/vm_env.sh"
@@ -77,22 +76,58 @@
             owner=vagrant group=vagrant
 
       #
+      # setup deployment steelscript directories
+      #
+      - name: steelscript wsgi directory
+        file: path={{ project_root_stage }}/wsgi
+            state=directory mode=775
+            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
+
+      - name: steelscript home directory
+        file: path={{ project_root_stage }}/wsgi/.steelscript
+            state=directory mode=775
+            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
+
+      - name: steelscript app fraemwork initial_data directory
+        file: path={{ project_root_stage }}/wsgi/initial_data
+            state=directory mode=775
+            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
+
+      - name: steelscript app fraemwork datacache directory
+        file: path={{ project_root_stage }}/wsgi/datacache
+            state=directory mode=775
+            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
+      #
       # setup apache config
       #
+      - name: add vagrant user to apache group
+        user:
+            name=vagrant
+            groups='www-data'
+            append=yes
+
+      - name: set apache umask to 002
+        lineinfile:
+            dest=/etc/apache2/envvars
+            line="umask 002"
+            regexp="^umask 002"
+            insertafter=EOF
+            state=present
+
       - name: flyscript site template
-        template: src=templates/flyscript_portal_site.j2
-            dest=/etc/apache2/sites-available/flyscript_portal
+        template: src=templates/steelscript_appfwk_site.j2
+            dest=/etc/apache2/sites-available/steelscript_appfwk_site
             mode=664
-            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
+            owner={{ project_owner_stage }} group={{ project_group_stage }}
         notify:
         - restart apache
 
       - name: enable flyscript site
-        file: path=/etc/apache2/sites-enabled/001-flyscript_portal
-            src=/etc/apache2/sites-available/flyscript_portal
+        file: path=/etc/apache2/sites-enabled/001-steelscript_appfwk
+            src=/etc/apache2/sites-available/steelscript_appfwk_site
             state=link
             mode=664
-            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
+            owner={{ project_owner_stage }} group={{ project_group_stage }}
         notify:
         - restart apache
 
@@ -100,12 +135,51 @@
         file: path=/etc/apache2/sites-enabled/000-default state=absent
 
       - name: install portal wsgi configuration
-        template: src=templates/flyscript_portal.wsgi
-            dest={{ project_root_deploy }}/wsgi/flyscript_portal.wsgi
+        template: src=templates/steelscript_appfwk.wsgi
+            dest={{ project_root_stage }}/wsgi/steelscript_appfwk.wsgi
             mode=664
-            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
+            owner={{ project_owner_stage }} group={{ project_group_stage }}
         notify:
         - restart apache
+
+
+      #
+      # setup mysql database
+      #
+      - name: Change root user password on first run
+        mysql_user: login_user=root
+                    login_password=''
+                    name=root
+                    password={{ mysql_root_password }}
+                    priv=*.*:ALL,GRANT
+                    host={{ item }}
+        with_items:
+          - $ansible_hostname
+          - 127.0.0.1
+          - ::1
+          - localhost
+        ignore_errors: true
+
+      - name: Add App Framework Database
+        mysql_db: name={{ mysql_django_db }}
+                  state=present
+                  login_user=root
+                  login_password={{ mysql_root_password }}
+
+      - name: Add App Framework django user
+        mysql_user: name={{ mysql_django_user }}
+                    password={{ mysql_django_password }}
+                    priv={{ mysql_django_db }}.*:ALL,GRANT
+                    host={{ item }}
+                    login_user=root
+                    login_password={{ mysql_root_password }}
+        with_items:
+          - $ansible_hostname
+          - 127.0.0.1
+          - ::1
+          - localhost
+        #ignore_errors: true
+
 
       - meta: flush_handlers
 
@@ -113,4 +187,3 @@
       - include: handlers.yml
 
 - include: stage.yml reset=true
-- include: deploy.yml reset=true

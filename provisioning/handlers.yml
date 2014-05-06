@@ -1,29 +1,51 @@
 ---
 #
-# Portal deployment handlers
+# System Handlers
 #
-- name: portal static directory
+- name: rebuild guest additions
+  command: /etc/init.d/vboxadd setup
+
+#
+# App Framework deployment handlers
+#
+- name: appfwk static directory
   file: path={{ project_root }}/{{ project_name }}/static
-      state=directory mode=775 
+      state=directory mode=775
       owner={{ project_owner }} group={{ project_group }}
 
-- name: portal datacache directory
+- name: appfwk datacache directory
   file: path={{ project_root }}/{{ project_name }}/datacache
-      state=directory mode=775 
+      state=directory mode=775
       owner={{ project_owner }} group={{ project_group }}
 
 - name: update virtualenv
   pip: requirements={{ project_root }}/{{ project_name }}/requirements.txt
       virtualenv={{ virtualenv }}
 
-# manual portal management
+- name: install steelscript to virtualenv
+  pip: name={{item}} virtualenv={{ virtualenv }}
+  with_items:
+      - MySQL-python
+      - git+https://gitlab.lab.nbttech.com/steelscript/steelscript-common.git#egg=steelscript.common
+      - git+https://gitlab.lab.nbttech.com/steelscript/steelscript-netprofiler.git#egg=steelscript.netprofiler
+      - git+https://gitlab.lab.nbttech.com/steelscript/steelscript-netshark.git#egg=steelscript.netshark
+      - git+https://gitlab.lab.nbttech.com/steelscript/steelscript-appfwk-core.git#egg=steelscript.appfwk.core
+      - git+https://gitlab.lab.nbttech.com/steelscript/steelscript-appfwk-business-hours.git#egg=steelscript.appfwk.business-hours
+
 #
-- name: portal syncdb
+# manual appfwk management
+#
+- name: appfwk bootstrap settings configs
+  command: >
+      {{ virtualenv }}/bin/python bootstrap.py settings
+      chdir={{ project_root }}/{{ project_name }}
+
+- name: appfwk syncdb
   django_manage: command=syncdb
       app_path={{ project_root }}/{{ project_name }}
       virtualenv={{ virtualenv }}
 
-- name: portal static files
+- name: appfwk static files
   django_manage: command=collectstatic
       app_path={{ project_root }}/{{ project_name }}
       virtualenv={{ virtualenv }}
@@ -33,12 +55,12 @@
       {{ virtualenv }}/bin/python manage.py clean_pyc --path .
       chdir={{ project_root }}/{{ project_name }}
 
-- name: portal reload
+- name: appfwk reload
   command: >
       {{ virtualenv }}/bin/python manage.py reload
       chdir={{ project_root }}/{{ project_name }}
 
-# automatic portal management
+# automatic appfwk management
 #   deletes db and starts from scratch
 #   handles:
 #       syncdb
@@ -46,12 +68,40 @@
 #       reload
 #       plus more
 #
-- name: portal reset
+- name: appfwk reset and drop users
+  command: >
+      {{ virtualenv }}/bin/python manage.py reset_portal --force --drop-users
+      chdir={{ project_root }}/{{ project_name }}
+
+- name: copy production settings
+  template: src=templates/production_settings.j2
+      dest={{ project_root_stage }}/{{ project_name }}/project/settings/production.py
+      mode=664
+      owner={{ project_owner_stage }} group={{ project_group_stage }}
+
+- name: copy admin_user
+  file: path={{ project_root_stage }}/wsgi/initial_data/initial_admin_user.json
+      src={{ project_root_stage }}/{{ project_name }}/initial_data/initial_admin_user.json
+      state=hard
+      mode=664
+      owner={{ project_owner_deploy }} group={{ project_group_deploy }}
+
+- name: appfwk reset and drop users for apache
+  command: >
+      {{ virtualenv }}/bin/python manage.py reset_portal --force --drop-users --settings=project.settings.production
+      chdir={{ project_root }}/{{ project_name }}
+
+- name: appfwk reset and keep users
   command: >
       {{ virtualenv }}/bin/python manage.py reset_portal --force
       chdir={{ project_root }}/{{ project_name }}
 
-- name: ensure correct portal ownership
+- name: appfwk reset and keep users for apache
+  command: >
+      {{ virtualenv }}/bin/python manage.py reset_portal --force --settings=project.settings.production
+      chdir={{ project_root }}/{{ project_name }}
+
+- name: ensure correct appfwk ownership
   file: path={{ project_root }}/{{ project_name }}
       state=directory
       owner={{ project_owner }} group={{ project_group }}

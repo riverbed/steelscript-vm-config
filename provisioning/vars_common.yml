@@ -1,8 +1,8 @@
 ---
-project_name: flyscript_portal
+project_name: steelscript_appfwk
 
-project_root_stage: /flyscript
-project_repo_stage: https://github.com/riverbed/flyscript-portal.git
+project_root_stage: /steelscript
+project_repo_stage: https://gitlab.lab.nbttech.com/steelscript/steelscript-appfwk.git
 project_owner_stage: vagrant
 project_group_stage: vagrant
 virtualenv_stage: "{{ project_root_stage }}/virtualenv"
@@ -12,6 +12,12 @@ project_repo_deploy: "{{ project_root_stage }}/{{ project_name }}"
 project_owner_deploy: www-data
 project_group_deploy: www-data
 virtualenv_deploy: "{{ project_root_deploy }}/virtualenv"
+
+mysql_root_password: vagrantRoot!
+
+mysql_django_db: django_appfwk_db
+mysql_django_user: django_appfwk
+mysql_django_password: djangoSteelScript!
 
 system_packages:
     # core packages
@@ -28,6 +34,9 @@ system_packages:
     - wget
     - wireshark
     - tshark
+    # database packages
+    - mysql-server
+    - libmysqlclient-dev
     # python packages
     - python
     - python-setuptools
@@ -44,8 +53,8 @@ system_packages:
 
 python_packages:
     - pip
-    # virtualenv
     - ipython
     - pysnmp
+    - MySQL-python
 
 

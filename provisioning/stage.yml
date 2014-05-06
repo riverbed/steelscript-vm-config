@@ -17,7 +17,8 @@
     reset: false
 
   tasks:
-      - name: portal github checkout with reset
+      - name: appfwk github checkout with reset
+        # used for initial provisioning
         when: reset
 
         git: repo={{ project_repo }}
@@ -25,14 +26,18 @@
            update=yes
            force={{ force_checkout }}
         notify:
-        - portal static directory
+        - appfwk static directory
         - update virtualenv
-        - portal static files
-        - portal reset
-        - ensure correct directory ownership
-        - restart apache
+        - install steelscript to virtualenv
+        - appfwk bootstrap settings configs
+        - appfwk static files
+        - appfwk reset and drop users
+        - copy production settings
+        - copy admin_user
+        - appfwk reset and drop users for apache
+        - ensure correct appfwk ownership
 
-      - name: portal github checkout without reset
+      - name: appfwk github checkout without reset
         when: not reset
 
         git: repo={{ project_repo }}
@@ -40,16 +45,14 @@
            update=yes
            force={{ force_checkout }}
         notify:
-        - portal static directory
+        - appfwk static directory
         - update virtualenv
-        - portal syncdb
-        - portal static files
-        - clear pyc files
-        - portal reload
-        - ensure correct directory ownership
-        - restart apache
+        - appfwk static files
+        - appfwk reset and keep users
+        - appfwk reset and keep users for apache
+        - ensure correct appfwk ownership
 
       - meta: flush_handlers
 
-  handlers: 
+  handlers:
       - include: handlers.yml

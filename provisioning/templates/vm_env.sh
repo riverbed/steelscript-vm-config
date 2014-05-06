@@ -8,9 +8,9 @@ USERGROUP=www-data
 
 export PORTAL_LOG=/var/www/flyscript_portal/log.txt
 
-export PORTAL_STAGE_DIR=/flyscript/flyscript_portal
-export PORTAL_STAGE_VENV=/flyscript/virtualenv
-export PORTAL_DEPLOY_DIR=/var/www/flyscript_portal
+export PORTAL_STAGE_DIR=/steelscript/steelscript_appfwk
+export PORTAL_STAGE_VENV=/steelscript/virtualenv
+export PORTAL_DEPLOY_DIR=/var/www/steelscript_appfwk
 export PORTAL_DEPLOY_VENV=/var/www/virtualenv
 
 alias portal_view_err_log='less $ERROR_LOG'

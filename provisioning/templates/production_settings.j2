@@ -1,0 +1,68 @@
+
+from project.settings.base import *
+
+# This file adds site specific options to the server settings
+# To activate this file for use, include the following option as part of
+# "manage.py" commands:
+#   --settings=project.settings_local
+#
+# For example:
+#   $ ./clean --reset --force --settings=project.settings_local
+
+# Optionally add additional applications specific to this webserver
+
+LOCAL_APPS = (
+    # additional apps can be listed here
+)
+INSTALLED_APPS += LOCAL_APPS
+
+# Configure alternate databases for development or production.  Leaving this
+# section commented will default to the development sqlite database.
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': '{{ mysql_django_db }}',
+        'USER': '{{ mysql_django_user}}',
+        'PASSWORD': '{{ mysql_django_password }}',
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
+
+# Setup alternate home for cache and initial data note that if the default
+# admin user file should be copied to initial_data or the superuser will need
+# to be manually created.
+DATAHOME = os.getenv('DATAHOME', PROJECT_ROOT)
+DATA_CACHE = os.path.join(DATAHOME, 'datacache')
+INITIAL_DATA = os.path.join(DATAHOME, 'initial_data')
+
+
+# These values override logging settings to send all INFO and above
+# messages to the system log server instead.
+LOGGING['disable_existing_loggers'] = True
+
+# remove these loggers since the configuration will attempt to write the
+# files even if they don't have a logger declared for them
+LOGGING['handlers'].pop('logfile')
+LOGGING['handlers'].pop('backend-log')
+
+LOGGING['loggers'] = {
+    'django.db.backends': {
+        'handlers': ['null'],
+        'level': 'DEBUG',
+        'propagate': False,
+    },
+    '': {
+        'handlers': ['syslog'],
+        'level': 'INFO',
+        'propagate': True,
+    },
+}
+# Add other settings customizations below, which will be local to this
+# machine only, and not recorded by git. This could include database or
+# other authentications, LDAP settings, or any other overrides.
+
+
+# For example LDAP configurations, see the file
+# `project/ldap_example.py`.

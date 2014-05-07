@@ -11,9 +11,16 @@ Vagrant.configure("2") do |config|
 
   config.ssh.guest_port = 22
 
-  config.vm.provider :virtualbox do |vb|
-      vb.customize ["modifyvm", :id, "--cpus", 2]
-      vb.customize ["modifyvm", :id, "--memory", 512]
+  config.vm.provider :virtualbox do |v|
+      v.customize ["modifyvm", :id, "--cpus", 2]
+      v.customize ["modifyvm", :id, "--memory", 512]
+  end
+
+  config.vm.provider :vmware_fusion do |v, override|
+      override.vm.box = "SteelScriptVM-VMWare"
+      override.vm.box_url = "http://files.vagrantup.com/precise64_fusion.box"
+      v.vmx["numvcpus"] = "2"
+      v.vmx["memsize"] = "512"
   end
 
   # setup ip to match ansible_hosts file

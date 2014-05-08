@@ -18,7 +18,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider :vmware_fusion do |v, override|
       override.vm.box = "SteelScriptVM-VMWare"
-      override.vm.box_url = "http://files.vagrantup.com/precise64_fusion.box"
+      override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
       v.vmx["numvcpus"] = "2"
       v.vmx["memsize"] = "512"
   end

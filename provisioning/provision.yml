@@ -17,6 +17,8 @@
 
       - name: upgrade base system
         apt: upgrade=safe update_cache=yes
+        notify: 
+        - rebuild vmware guest additions
 
       - name: install core system, networking, and python packages
         apt: pkg={{ item }} update_cache=yes cache_valid_time=3600

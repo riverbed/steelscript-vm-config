@@ -2,8 +2,11 @@
 #
 # System Handlers
 #
-- name: rebuild guest additions
+- name: rebuild vbox guest additions
   command: /etc/init.d/vboxadd setup
+
+- name: rebuild vmware guest additions
+  command: vmware-config-tools.pl -d
 
 #
 # App Framework deployment handlers

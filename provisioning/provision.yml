@@ -15,10 +15,10 @@
       - name: start zeroconf service
         service: name=avahi-daemon state=started
 
-      - name: upgrade base system
-        apt: upgrade=safe update_cache=yes
-        notify: 
-        - rebuild vmware guest additions
+      #- name: upgrade base system
+      #  apt: upgrade=safe update_cache=yes
+      #  notify:
+      #  - rebuild vmware guest additions
 
       - name: install core system, networking, and python packages
         apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
@@ -30,45 +30,57 @@
         with_items: python_packages
 
       - name: install virtualenv
-        pip: name=virtualenv version=1.10
+        pip: name=virtualenv version=1.11.6
 
       # ansible cannot be easy_install'ed
       - name: install ansible
         pip: name=ansible
 
-      #
-      # setup development steelscript directories and templates
-      #
-      - name: steelscript root directory
-        file: path={{ project_root_stage }}
-            state=directory mode=775
-            owner={{ project_owner_stage }} group={{ project_group_stage }}
 
-      - name: steelscript app framework directory
-        file: path={{ project_root_stage }}/{{ project_name }}
-            state=directory mode=775
-            owner={{ project_owner_stage }} group={{ project_group_stage }}
-        register: portal_dir_result
+      #
+      # setup development virtualenv and steelscript packages
+      #
+      - name: create virtualenv
+        shell: virtualenv {{ virtualenv_devel }}
+            creates={{ virtualenv_devel }}/bin/activate
 
-      - name: steelscript tools directory
-        file: path=/steelscript/tools
+      - name: create source directory
+        file: path={{ project_home_devel }}/src
             state=directory mode=775
-            owner=root group=root
+            owner={{ project_owner_devel }} group={{ project_group_devel }}
+
+      - name: clone base steelscript repo
+        git: repo={{ steelscript_repo }}
+           dest={{ project_home_devel }}/src/steelscript
+           update=yes
+           force=yes
+
+      # need to use '.' since 'source' doesn't exist under /bin/sh
+      - name: update base steelscript
+        shell: >
+            . {{ virtualenv_devel }}/bin/activate && python setup.py develop
+            chdir={{ project_home_devel }}/src/steelscript
+
+      # need to use '.' since 'source' doesn't exist under /bin/sh
+      - name: update steelscript packages and app framework
+        shell: >
+            . {{ virtualenv_devel }}/bin/activate && steel install -g --appfwk --develop -d /home/vagrant/src
+            chdir={{ project_home_devel }}
 
       #
       # setup enviroment for aliases, helper functions, and ipython notebooks
       #
       - name: steelscript helper functions and aliases
         template: src=templates/vm_env.sh
-            dest={{ project_root_stage }}/tools/vm_env.sh
+            dest={{ project_home_devel }}/.vm_env.sh
             mode=775
-            owner=root group=root
+            owner=vagrant group=vagrant
 
       - name: update bashrc to source vm_env.sh
         lineinfile:
             dest=/home/vagrant/.bashrc
-            line="source {{ project_root_stage }}/tools/vm_env.sh"
-            regexp="^source {{ project_root_stage }}/tools/vm_env.sh"
+            line="source ~/.vm_env.sh"
+            regexp="^source ~/.vm_env.sh"
             insertafter=EOF
             state=present
 
@@ -78,37 +90,32 @@
             owner=vagrant group=vagrant
 
       #
-      # setup deployment steelscript directories
+      # create development appfwk project
       #
-      - name: steelscript wsgi directory
-        file: path={{ project_root_stage }}/wsgi
-            state=directory mode=775
-            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
+      - name: create app framework project directory
+        shell: >
+            . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_devel}}
+            chdir={{ project_home_devel }}
+            creates={{ project_root_devel}}
+        sudo_user: vagrant
 
-      - name: steelscript home directory
-        file: path={{ project_root_stage }}/wsgi/.steelscript
-            state=directory mode=775
-            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
+      - name: initialize default app framework
+        shell: >
+            . {{ virtualenv_devel }}/bin/activate && steel appfwk init
+            chdir={{ project_root_devel }}
+            creates={{ project_root_devel}}/project.db
+        sudo_user: vagrant
 
-      - name: steelscript app fraemwork initial_data directory
-        file: path={{ project_root_stage }}/wsgi/initial_data
-            state=directory mode=775
-            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
-
-      - name: steelscript app fraemwork datacache directory
-        file: path={{ project_root_stage }}/wsgi/datacache
-            state=directory mode=775
-            owner={{ project_owner_deploy }} group={{ project_group_deploy }}
       #
       # setup apache config
       #
-      - name: add vagrant user to apache group
+      - name: apache - add vagrant user to apache group
         user:
             name=vagrant
             groups='www-data'
             append=yes
 
-      - name: set apache umask to 002
+      - name: apache - set apache umask to 002
         lineinfile:
             dest=/etc/apache2/envvars
             line="umask 002"
@@ -116,39 +123,35 @@
             insertafter=EOF
             state=present
 
-      - name: flyscript site template
+      - name: apache - install mysql dependency
+        pip: name={{item}} virtualenv={{ virtualenv_devel }}
+        with_items:
+            - MySQL-python
+
+      - name: apache - steelscript appfwk site template
         template: src=templates/steelscript_appfwk_site.j2
             dest=/etc/apache2/sites-available/steelscript_appfwk_site
             mode=664
-            owner={{ project_owner_stage }} group={{ project_group_stage }}
+            owner=root group=root
         notify:
         - restart apache
 
-      - name: enable flyscript site
+      - name: apache - enable appfwk site
         file: path=/etc/apache2/sites-enabled/001-steelscript_appfwk
             src=/etc/apache2/sites-available/steelscript_appfwk_site
             state=link
             mode=664
-            owner={{ project_owner_stage }} group={{ project_group_stage }}
+            owner=root group=root
         notify:
         - restart apache
 
-      - name: disable default site
+      - name: apache - disable default site
         file: path=/etc/apache2/sites-enabled/000-default state=absent
-
-      - name: install portal wsgi configuration
-        template: src=templates/steelscript_appfwk.wsgi
-            dest={{ project_root_stage }}/wsgi/steelscript_appfwk.wsgi
-            mode=664
-            owner={{ project_owner_stage }} group={{ project_group_stage }}
-        notify:
-        - restart apache
-
 
       #
       # setup mysql database
       #
-      - name: Change root user password on first run
+      - name: mysql - change root user password on first run
         mysql_user: login_user=root
                     login_password=''
                     name=root
@@ -162,13 +165,13 @@
           - localhost
         ignore_errors: true
 
-      - name: Add App Framework Database
+      - name: mysql - add App Framework Database
         mysql_db: name={{ mysql_django_db }}
                   state=present
                   login_user=root
                   login_password={{ mysql_root_password }}
 
-      - name: Add App Framework django user
+      - name: mysql - add App Framework django user
         mysql_user: name={{ mysql_django_user }}
                     password={{ mysql_django_password }}
                     priv={{ mysql_django_db }}.*:ALL,GRANT
@@ -182,10 +185,79 @@
           - localhost
         #ignore_errors: true
 
+      #
+      # setup apache project
+      #
+      - name: apache - steelscript directory
+        file: path={{ project_home_apache }}
+            state=directory mode=775
+            owner={{ project_owner_apache }} group={{ project_group_apache }}
+
+      - name: apache - create app framework project directory
+        shell: >
+            . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_apache }}
+            chdir={{ project_home_apache }}
+            creates={{ project_root_apache }}
+        sudo_user: www-data
+        environment:
+            HOME: "{{ project_home_apache }}"
+
+      #- name: apache - steelscript wsgi directory
+      #  file: path={{ project_wsgi }}
+      #      state=directory mode=775
+      #      owner={{ project_owner_apache }} group={{ project_group_apache }}
+
+      - name: apache - steelscript home directory
+        file: path={{ project_wsgi }}/.steelscript
+            state=directory mode=775
+            owner={{ project_owner_apache }} group={{ project_group_apache }}
+
+      - name: apache - install appfwk wsgi configuration
+        template: src=templates/steelscript_appfwk.wsgi
+            dest={{ project_wsgi }}/steelscript_appfwk.wsgi
+            mode=664
+            owner={{ project_owner_apache }} group={{ project_group_apache }}
+
+      #- name: apache - ensure correct appfwk ownership
+      #  file: path={{ project_root_apache }}
+      #      state=directory
+      #      owner={{ project_owner_apache }} group={{ project_group_apache }}
+      #      recurse=yes
+
+      - name: copy production settings
+        template: src=templates/production_settings.j2
+            dest={{ project_root_apache }}/local_settings.py
+            mode=664
+            owner={{ project_owner_apache }} group={{ project_group_apache }}
+        notify:
+        - restart apache
+
+      - name: apache - initialize default app framework
+        shell: >
+            . {{ virtualenv_devel }}/bin/activate && steel appfwk init
+            chdir={{ project_root_apache }}
+            creates={{ project_root_apache }}/local_settings.pyc
+        sudo_user: www-data
+        environment:
+            HOME: "{{ project_home_apache }}"
+        notify:
+        - restart apache
+
+      - name: apache - collect static files
+        shell: >
+            . {{ virtualenv_devel }}/bin/activate && python manage.py collectstatic --noinput
+            chdir={{ project_root_apache }}
+            creates={{ project_root_apache }}/static
+        sudo_user: www-data
+        environment:
+            HOME: "{{ project_home_apache }}"
+        notify:
+        - restart apache
+
 
       - meta: flush_handlers
 
   handlers:
       - include: handlers.yml
 
-- include: stage.yml reset=true
+#- include: stage.yml reset=true

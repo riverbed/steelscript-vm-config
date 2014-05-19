@@ -16,38 +16,14 @@
       state=directory mode=775
       owner={{ project_owner }} group={{ project_group }}
 
-- name: appfwk datacache directory
-  file: path={{ project_root }}/{{ project_name }}/datacache
-      state=directory mode=775
-      owner={{ project_owner }} group={{ project_group }}
-
 - name: update virtualenv
   pip: requirements={{ project_root }}/{{ project_name }}/requirements.txt
       virtualenv={{ virtualenv }}
 
-- name: install steelscript to virtualenv
-  pip: name={{item}} virtualenv={{ virtualenv }}
-  with_items:
-      - MySQL-python
-      - git+https://gitlab.lab.nbttech.com/steelscript/steelscript-common.git#egg=steelscript.common
-      - git+https://gitlab.lab.nbttech.com/steelscript/steelscript-netprofiler.git#egg=steelscript.netprofiler
-      - git+https://gitlab.lab.nbttech.com/steelscript/steelscript-netshark.git#egg=steelscript.netshark
-      - git+https://gitlab.lab.nbttech.com/steelscript/steelscript-appfwk-core.git#egg=steelscript.appfwk.core
-      - git+https://gitlab.lab.nbttech.com/steelscript/steelscript-appfwk-business-hours.git#egg=steelscript.appfwk.business-hours
 
 #
 # manual appfwk management
 #
-- name: appfwk bootstrap settings configs
-  command: >
-      {{ virtualenv }}/bin/python bootstrap.py settings
-      chdir={{ project_root }}/{{ project_name }}
-
-- name: appfwk syncdb
-  django_manage: command=syncdb
-      app_path={{ project_root }}/{{ project_name }}
-      virtualenv={{ virtualenv }}
-
 - name: appfwk static files
   django_manage: command=collectstatic
       app_path={{ project_root }}/{{ project_name }}

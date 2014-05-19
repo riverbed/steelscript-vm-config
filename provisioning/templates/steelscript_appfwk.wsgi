@@ -7,10 +7,10 @@
 import os
 import sys
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'project.settings.production'
-os.environ['HOME'] = '{{ project_root_stage }}/wsgi'
-os.environ['DATAHOME'] = '{{ project_root_stage }}/wsgi'
-sys.path.append('{{ project_root_stage }}/{{ project_name }}')
+os.environ['DJANGO_SETTINGS_MODULE'] = 'local_settings'
+os.environ['HOME'] = '{{ project_wsgi }}'
+os.environ['DATAHOME'] = '{{ project_wsgi }}'
+sys.path.append('{{ project_root_apache }}')
 
 # borrow monkey patch from app framework manage.py module
 from manage import find_management_module

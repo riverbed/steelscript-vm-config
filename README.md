@@ -6,7 +6,7 @@ Command-line Python Development Environment with SteelScript
 ## REQUIREMENTS
 
 * [VirtualBox](http://www.virtualbox.org/)
-* [Vagrant](http://www.vagrantup.com/) - version 1.3.5 or later
+* [Vagrant](http://www.vagrantup.com/) - version 1.6.2 or later
 * [Ansible](http://www.ansibleworks.com) - version 1.3.4 or later
 * [git](http://git-scm.com/downloads)
 
@@ -72,22 +72,15 @@ A summary of included aliases and commands:
 
 Aliases / Functions     |  Description                                                            |
 ------------------------|:------------------------------------------------------------------------|
-`portal_view_err_log`   | show the apache error log
-`portal_view_access_log`| show the apache access log
-`portal_view_portal_log`| show the portal debug log
-`cdportal`              | shortcut to `cd /steelscript/steelscript_appfwk`, the staging directory
-`cdwww`                 | shortcut to `cd /var/www`, the deployed directory
+`view_err_log`          | show the apache error log
+`view_access_log`       | show the apache access log
+`view_portal_log`       | show the portal debug log
+`cdproject`             | shortcut to `cd /home/vagrant/steelscript_appfwk`, the staging directory
+`cdwww`                 | shortcut to `cd /steelscript/www`, the deployed directory
 `cdshared`              | shortcut to `cd /vagrant`, the shared directory with the host machine.
                         | This can be a convenient way to share files between the guest and host.
 `run_ipython_notebooks` | shortcut to run ipython notebook server (documented below) |
 `portal_dev_server`     | shortcut to run the django development server in the staging directory
-`portal_update`         | pull the latest changes from github and merge them into the
-                        | staging directory.  If you have made changes already, you may need
-                        | to run `git stash` before this command.  After it completes, run `git pop`
-                        | to have your changes re-applied.
-`portal_deploy`         | push changes from the staging area to the webserver.
-`portal_reset_www`      | runs a `clean --reset` on the deployed directory.  Helpful for
-                        | troubleshooting especially if the DB gets out of sync.
 `portal_collect_logs`   | collects and zips up all the appropriate logs to help with
                         | debugging VM or Portal issues.
 

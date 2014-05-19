@@ -7,7 +7,6 @@
       - vars_common.yml
 
   tasks:
-      # XXX ignore in final version?
       - name: configure apt-cache
         apt: pkg=squid-deb-proxy-client update_cache=yes cache_valid_time=3600
             state=present

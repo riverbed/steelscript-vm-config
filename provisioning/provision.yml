@@ -42,6 +42,7 @@
       - name: create virtualenv
         shell: virtualenv {{ virtualenv_devel }}
             creates={{ virtualenv_devel }}/bin/activate
+        sudo_user: vagrant
 
       - name: create source directory
         file: path={{ project_home_devel }}/src
@@ -53,18 +54,21 @@
            dest={{ project_home_devel }}/src/steelscript
            update=yes
            force=yes
+        sudo_user: vagrant
 
       # need to use '.' since 'source' doesn't exist under /bin/sh
       - name: update base steelscript
         shell: >
             . {{ virtualenv_devel }}/bin/activate && python setup.py develop
             chdir={{ project_home_devel }}/src/steelscript
+        sudo_user: vagrant
 
       # need to use '.' since 'source' doesn't exist under /bin/sh
       - name: update steelscript packages and app framework
         shell: >
             . {{ virtualenv_devel }}/bin/activate && steel install -g --appfwk --develop -d /home/vagrant/src
             chdir={{ project_home_devel }}
+        sudo_user: vagrant
 
       #
       # setup enviroment for aliases, helper functions, and ipython notebooks

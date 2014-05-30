@@ -20,7 +20,7 @@ alias cdproject='cd $PROJECT_DEV_DIR'
 alias cdwww='cd $PROJECT_APACHE_DIR'
 alias cdshared='cd /vagrant'
 
-alias portal_dev_server='cdproject && $PROJECT_DEV_VENV/bin/python $PROJECT_DEV_DIR/manage.py runserver `facter ipaddress`:8000'
+alias appfwk_dev_server='cdproject && $PROJECT_DEV_VENV/bin/python $PROJECT_DEV_DIR/manage.py runserver `facter ipaddress`:8000'
 alias run_ipython_notebook='cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --pylab=inline'
 
 alias virtualenv_dev='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
@@ -32,7 +32,7 @@ rotate_logs() {
     echo "done."
 }
 
-portal_clean_perms() {
+appfwk_clean_perms() {
     # update all perms correctly in staging dir
     echo -n "Updating Portal ownership ... "
     cdportal
@@ -41,7 +41,7 @@ portal_clean_perms() {
     echo "done."
 }
 
-portal_collect_logs() {
+appfwk_collect_logs() {
     echo -n "Collecting all log files and generating zipfile ... "
     cdwww
     sudo $PORTAL_DEPLOY_VENV/bin/python manage.py collect_logs &> /dev/null

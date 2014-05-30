@@ -1,4 +1,1 @@
-SteelScript VM
-==============
-
-TBD
+../README.rst

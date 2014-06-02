@@ -43,6 +43,14 @@ LOGGING['handlers']['backend-log']['filename'] = os.path.join(DATAHOME, 'logs', 
 #LOGGING['handlers'].pop('logfile')
 #LOGGING['handlers'].pop('backend-log')
 #
+#LOGGING['handlers']['syslog'] = {
+#    'level': 'DEBUG',
+#    'class': 'logging.handlers.SysLogHandler',
+#    'formatter': 'standard_syslog',
+#    'facility': SysLogHandler.LOG_USER,
+#    'address': '/var/run/syslog' if sys.platform == 'darwin' else '/dev/log'
+#}
+#
 #LOGGING['loggers'] = {
 #    'django.db.backends': {
 #        'handlers': ['null'],

@@ -12,17 +12,16 @@
             state=present
 
       - name: start zeroconf service
-        service: name=avahi-daemon state=started
-
-      #- name: upgrade base system
-      #  apt: upgrade=safe update_cache=yes
-      #  notify:
-      #  - rebuild vmware guest additions
+        service: name=avahi-daemon state=started enabled=yes
 
       - name: install core system, networking, and python packages
         apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
             state=present
         with_items: system_packages
+
+      - name: update openssl
+        apt: pkg=openssl update_cache=yes cache_valid_time=3600
+            state=latest
 
       - name: install python system packages
         easy_install: name={{item}}
@@ -106,7 +105,7 @@
         shell: >
             . {{ virtualenv_devel }}/bin/activate && steel appfwk init
             chdir={{ project_root_devel }}
-            creates={{ project_root_devel}}/project.db
+            creates={{ project_root_devel}}/data/project.db
         sudo_user: vagrant
 
       #
@@ -188,6 +187,14 @@
           - localhost
         #ignore_errors: true
 
+      # see https://github.com/ansible/ansible/issues/3572
+      # command is ubuntu 12.04 specific
+      - name: enable default mysql init scripts
+        shell: update-rc.d mysql defaults
+
+      - name: start and enable mysql service
+        service: name=mysql state=started enabled=yes
+
       #
       # setup apache project
       #
@@ -205,11 +212,6 @@
         environment:
             HOME: "{{ project_home_apache }}"
 
-      #- name: apache - steelscript wsgi directory
-      #  file: path={{ project_wsgi }}
-      #      state=directory mode=775
-      #      owner={{ project_owner_apache }} group={{ project_group_apache }}
-
       - name: apache - steelscript home directory
         file: path={{ project_wsgi }}/.steelscript
             state=directory mode=775
@@ -221,12 +223,6 @@
             mode=664
             owner={{ project_owner_apache }} group={{ project_group_apache }}
 
-      #- name: apache - ensure correct appfwk ownership
-      #  file: path={{ project_root_apache }}
-      #      state=directory
-      #      owner={{ project_owner_apache }} group={{ project_group_apache }}
-      #      recurse=yes
-
       - name: copy production settings
         template: src=templates/production_settings.j2
             dest={{ project_root_apache }}/local_settings.py
@@ -235,11 +231,11 @@
         notify:
         - restart apache
 
-      - name: apache - initialize default app framework
+      - name: apache - reset and initialize default app framework
         shell: >
-            . {{ virtualenv_devel }}/bin/activate && steel appfwk init
+            . {{ virtualenv_devel }}/bin/activate && python manage.py reset_appfwk --force --drop-users --trace && touch .initialized
             chdir={{ project_root_apache }}
-            creates={{ project_root_apache }}/local_settings.pyc
+            creates={{ project_root_apache }}/.initialized
         sudo_user: www-data
         environment:
             HOME: "{{ project_home_apache }}"
@@ -257,6 +253,13 @@
         notify:
         - restart apache
 
+      # see https://github.com/ansible/ansible/issues/3572
+      # command is ubuntu 12.04 specific
+      - name: enable default apache init scripts
+        shell: update-rc.d apache2 defaults
+
+      - name: start and enable apache service
+        service: name=apache2 state=started enabled=yes
 
       - meta: flush_handlers
 

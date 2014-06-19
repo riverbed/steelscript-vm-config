@@ -26,6 +26,9 @@ alias run_ipython_notebook='cd ~/ipython_notebooks && ipython notebook --ip=`fac
 alias virtualenv_dev='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 alias virtualenv_www='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 
+# Activate virtual environment by default on login
+virtualenv_dev
+
 rotate_logs() {
     echo -n "Rotating apache logs ... "
     sudo logrotate -f /etc/logrotate.d/apache2
@@ -34,11 +37,16 @@ rotate_logs() {
 
 appfwk_clean_perms() {
     # update all perms correctly in staging dir
-    echo -n "Updating Portal ownership ... "
-    cdportal
+    CURDIR=`pwd`
+    echo -n "Updating app framework development ownership ... "
+    cdproject
     sudo chown -R vagrant:vagrant *
-    cd -
     echo "done."
+    echo -n "Updating app framework apache ownership ... "
+    cdwww
+    sudo chown -R www-data:www-data *
+    echo "done."
+    cd $CURDIR
 }
 
 appfwk_collect_logs() {

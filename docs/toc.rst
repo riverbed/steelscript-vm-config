@@ -3,4 +3,4 @@ SteelScript VM Config
 
 .. toctree::
 
-   overview
+   SteelScript VM Config Overview <overview>

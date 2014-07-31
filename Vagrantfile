@@ -30,10 +30,21 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest:8000, host: 38000
   config.vm.network :forwarded_port, guest:8888, host: 38888
 
+  # avoid root mesg issues from https://github.com/mitchellh/vagrant/issues/1673
+  config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+
+  config.vm.provision :shell do |s|
+      s.inline = "F=/vagrant/packages/installed_pkgs_pre_provision.txt && if [ ! -e $F ]; then  dpkg --get-selections > $F; fi"
+  end
+
   config.vm.provision :ansible do |ansible|
       ansible.sudo = true
       ansible.playbook = "provisioning/provision.yml"
       ansible.verbose = true
+  end
+
+  config.vm.provision :shell do |s|
+      s.inline = "F=/vagrant/packages/installed_pkgs_post_provision.txt && if [ ! -e $F ]; then dpkg --get-selections > $F; /home/vagrant/virtualenv/bin/pip freeze | grep -v ^-e > /vagrant/packages/installed_pkgs_python.txti; fi"
   end
 
 end

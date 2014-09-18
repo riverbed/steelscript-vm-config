@@ -7,8 +7,8 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "SteelScriptVM"
-  config.vm.box_url = "http://files.vagrantup.com/precise32.box"
+  # this references the latest version in vagrant cloud
+  config.vm.box = "puppetlabs/centos-6.5-64-nocm"
 
   config.ssh.guest_port = 22
 
@@ -18,8 +18,6 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provider :vmware_fusion do |v, override|
-      override.vm.box = "SteelScriptVM-VMWare"
-      override.vm.box_url = "http://files.vagrantup.com/precise64_vmware.box"
       v.vmx["numvcpus"] = "2"
       v.vmx["memsize"] = "512"
   end

@@ -5,10 +5,10 @@ export PROJECT_DEV_VENV={{ virtualenv_devel }}
 export PROJECT_APACHE_DIR={{ project_root_apache }}
 export PROJECT_APACHE_VENV={{ virtualenv_apache }}
 
-APACHE_LOGDIR=/var/log/apache2
+APACHE_LOGDIR=/var/log/httpd
 export ERROR_LOG=$APACHE_LOGDIR/error.log
 export ACCESS_LOG=$APACHE_LOGDIR/other_vhosts_access.log
-USERGROUP=www-data
+USERGROUP=apache
 
 export DEV_LOGDIR=$PROJECT_DEV_DIR/logs
 

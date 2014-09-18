@@ -7,21 +7,9 @@
       - vars_common.yml
 
   tasks:
-      - name: configure apt-cache
-        apt: pkg=squid-deb-proxy-client update_cache=yes cache_valid_time=3600
-            state=present
-
-      - name: start zeroconf service
-        service: name=avahi-daemon state=started enabled=yes
-
       - name: install core system, networking, and python packages
-        apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
-            state=present
+        yum: name={{ item }} state=present
         with_items: system_packages
-
-      - name: update openssl
-        apt: pkg=openssl update_cache=yes cache_valid_time=3600
-            state=latest
 
       - name: install python system packages
         easy_install: name={{item}}
@@ -111,19 +99,19 @@
       #
       # setup apache config
       #
-      - name: apache - add vagrant user to apache group
-        user:
-            name=vagrant
-            groups='www-data'
-            append=yes
-
-      - name: apache - set apache umask to 002
-        lineinfile:
-            dest=/etc/apache2/envvars
-            line="umask 002"
-            regexp="^umask 002"
-            insertafter=EOF
-            state=present
+#      - name: apache - add vagrant user to apache group
+#        user:
+#            name=vagrant
+#            groups='www-data'
+#            append=yes
+#
+#      - name: apache - set apache umask to 002
+#        lineinfile:
+#            dest=/etc/apache2/envvars
+#            line="umask 002"
+#            regexp="^umask 002"
+#            insertafter=EOF
+#            state=present
 
       - name: apache - install mysql dependency
         pip: name={{item}} virtualenv={{ virtualenv_devel }}
@@ -132,27 +120,35 @@
 
       - name: apache - steelscript appfwk site template
         template: src=templates/steelscript_appfwk_site.j2
-            dest=/etc/apache2/sites-available/steelscript_appfwk_site
+            dest=/etc/httpd/conf.d/steelscript_appfwk_site.conf
             mode=664
             owner=root group=root
         notify:
         - restart apache
 
-      - name: apache - enable appfwk site
-        file: path=/etc/apache2/sites-enabled/001-steelscript_appfwk
-            src=/etc/apache2/sites-available/steelscript_appfwk_site
-            state=link
-            mode=664
-            owner=root group=root
-        notify:
-        - restart apache
-
-      - name: apache - disable default site
-        file: path=/etc/apache2/sites-enabled/000-default state=absent
+#      - name: apache - enable appfwk site
+#        file: path=/etc/apache2/sites-enabled/001-steelscript_appfwk
+#            src=/etc/apache2/sites-available/steelscript_appfwk_site
+#            state=link
+#            mode=664
+#            owner=root group=root
+#        notify:
+#        - restart apache
+#
+#      - name: apache - disable default site
+#        file: path=/etc/apache2/sites-enabled/000-default state=absent
 
       #
       # setup mysql database
       #
+      # see https://github.com/ansible/ansible/issues/3572
+      # command is ubuntu 12.04 specific
+ #      - name: enable default mysql init scripts
+ #        shell: update-rc.d mysql defaults
+
+      - name: start and enable mysql service
+        service: name=mysqld state=started enabled=yes
+
       - name: mysql - change root user password on first run
         mysql_user: login_user=root
                     login_password=''
@@ -187,17 +183,17 @@
           - localhost
         #ignore_errors: true
 
-      # see https://github.com/ansible/ansible/issues/3572
-      # command is ubuntu 12.04 specific
-      - name: enable default mysql init scripts
-        shell: update-rc.d mysql defaults
-
-      - name: start and enable mysql service
-        service: name=mysql state=started enabled=yes
-
       #
       # setup apache project
       #
+#      # see https://github.com/ansible/ansible/issues/3572
+#      # command is ubuntu 12.04 specific
+#      - name: enable default apache init scripts
+#        shell: update-rc.d apache2 defaults
+
+      - name: start and enable apache service
+        service: name={{ service_name }} state=started enabled=yes
+
       - name: apache - steelscript directory
         file: path={{ project_home_apache }}
             state=directory mode=775
@@ -208,7 +204,7 @@
             . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_apache }}
             chdir={{ project_home_apache }}
             creates={{ project_root_apache }}
-        sudo_user: www-data
+        #sudo_user: "{{ project_owner_apache }}"
         environment:
             HOME: "{{ project_home_apache }}"
 
@@ -236,7 +232,7 @@
             . {{ virtualenv_devel }}/bin/activate && python manage.py reset_appfwk --force --drop-users --trace && touch .initialized
             chdir={{ project_root_apache }}
             creates={{ project_root_apache }}/.initialized
-        sudo_user: www-data
+        #sudo_user: "{{ project_owner_apache }}"
         environment:
             HOME: "{{ project_home_apache }}"
         notify:
@@ -247,19 +243,17 @@
             . {{ virtualenv_devel }}/bin/activate && python manage.py collectstatic --noinput
             chdir={{ project_root_apache }}
             creates={{ project_root_apache }}/static
-        sudo_user: www-data
+        #sudo_user: "{{ project_owner_apache }}"
         environment:
             HOME: "{{ project_home_apache }}"
         notify:
         - restart apache
 
-      # see https://github.com/ansible/ansible/issues/3572
-      # command is ubuntu 12.04 specific
-      - name: enable default apache init scripts
-        shell: update-rc.d apache2 defaults
-
-      - name: start and enable apache service
-        service: name=apache2 state=started enabled=yes
+      - name: ensure correct appfwk ownership
+        file: path={{ project_root_apache }}
+            state=directory
+            owner={{ project_owner_apache }} group={{ project_group_apache }}
+            recurse=yes
 
       - meta: flush_handlers
 

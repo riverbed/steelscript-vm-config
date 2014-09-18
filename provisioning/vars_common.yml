@@ -13,16 +13,18 @@ virtualenv_devel: "{{ project_home_devel }}/virtualenv"
 project_home_apache: /steelscript
 project_root_apache: "{{ project_home_apache }}/www"
 project_wsgi: "{{ project_root_apache }}"
-project_owner_apache: www-data
-project_group_apache: www-data
+project_owner_apache: apache
+project_group_apache: apache
 virtualenv_apache: "{{ project_home_apache }}/virtualenv"
+
+service_name: httpd
 
 mysql_root_password: vagrantRoot!
 mysql_django_db: django_appfwk_db
 mysql_django_user: django_appfwk
 mysql_django_password: djangoSteelScript!
 
-system_packages:
+system_packages_debian:
     # core packages
     - build-essential
     - git-core
@@ -33,6 +35,7 @@ system_packages:
     # networking packages
     - snmp
     - snmpd
+    - openldap-dev
     - curl
     - wget
     - wireshark
@@ -48,15 +51,59 @@ system_packages:
     - sqlite3
     - python-matplotlib
     - python-imaging
+    - python-ldap
     - ipython-notebook
     - python-nose
     # web server packages
     - apache2
     - libapache2-mod-wsgi
 
+system_packages_redhat:
+    # core packages
+    - git
+    #- tig - unavailable from yum
+    - vim-enhanced
+    - emacs
+    - libselinux-python
+    #- python-keyczar
+    # dev packages
+    - gcc-c++
+    - zlib-devel
+    - openssl-devel
+    - python-devel
+    - sqlite-devel
+    - bzip2-devel
+    - openldap-devel
+    - libxslt-devel
+
+    # networking packages
+    - net-snmp
+    - curl
+    - wget
+    - wireshark
+
+    # python packages
+    - python
+    - python-setuptools
+    - python-matplotlib
+    - python-imaging
+    - python-ldap
+    - numpy
+    - python-nose
+
+    # web server packages
+    - mysql
+    - mysql-server
+    - mysql-devel
+    - httpd
+    - mod_ssl
+    - mod_wsgi
+
+system_packages: "{{ system_packages_redhat }}"
+
 python_packages:
     - pip
-    - ipython
+      #- ipython
     - pysnmp
     - MySQL-python
 

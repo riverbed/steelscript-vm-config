@@ -41,7 +41,45 @@ alias stop_scheduler='sudo kill `cat /steelscript/scheduler/supervisord.pid`'
 alias view_supervisor_log='sudo less $SCHEDULER_DIR/supervisord.log'
 alias view_scheduler_log='sudo less $SCHEDULER_DIR/scheduler.log'
 
+upgrade_packages_from_dir() {
+    PKGDIR=$1
 
+    for PKG in `ls $PKGDIR`; do
+        /home/vagrant/virtualenv/bin/pip install -U --no-deps $PKGDIR/$PKG
+    done
+    sudo apachectl restart
+}
+
+convert_steelscript_site_links() {
+    # update site symlinks to libary files from git repositories
+    USER=$1
+    SITE_DIR=$2
+
+    cd $SITE_DIR
+    sudo rm manage.py
+    sudo -u $USER ln -s /home/vagrant/virtualenv/lib/python2.7/site-packages/steelscript/appfwk/manage.py
+    sudo rm media
+    sudo -u $USER ln -s /home/vagrant/virtualenv/lib/python2.7/site-packages/steelscript/appfwk/media
+    sudo rm thirdparty
+    sudo -u $USER ln -s /home/vagrant/virtualenv/lib/python2.7/site-packages/steelscript/appfwk/thirdparty
+
+    sudo -u $USER /home/vagrant/virtualenv/bin/python manage.py collectstatic --noinput
+    sudo apachectl restart
+}
+
+convert_steelscript_pkgs() {
+    # this will migrate the developer-mode packages to sdist packages instead
+    # needed in order to install updates from source packages rather than
+    # github updates
+    CURDIR=`pwd`
+    PKGDIR=$1
+    upgrade_packages_from_dir $PKGDIR
+
+    convert_steelscript_site_links vagrant /home/vagrant/appfwk_project
+    convert_steelscript_site_links www-data /steelscript/www
+
+    cd $CURDIR
+}
 
 rotate_logs() {
     echo -n "Rotating apache logs ... "

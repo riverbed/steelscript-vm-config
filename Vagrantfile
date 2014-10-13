@@ -27,6 +27,7 @@ Vagrant.configure("2") do |config|
   # setup ip to match ansible_hosts file
   config.vm.network :private_network, type: :dhcp
   config.vm.network :forwarded_port, guest:80, host: 30080
+  config.vm.network :forwarded_port, guest:443, host: 30443
   config.vm.network :forwarded_port, guest:8000, host: 38000
   config.vm.network :forwarded_port, guest:8888, host: 38888
 

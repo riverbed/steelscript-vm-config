@@ -56,17 +56,15 @@
         sudo_user: vagrant
 
       # need to use '.' since 'source' doesn't exist under /bin/sh
-      - name: update base steelscript
-        shell: >
-            . {{ virtualenv_devel }}/bin/activate && python setup.py develop
-            chdir={{ project_home_devel }}/src/steelscript
+      - name: download steelscript bootstrap
+        get_url: url=https://support.riverbed.com/apis/steelscript/_downloads/steel_bootstrap.py
+            dest={{ project_home_devel }}/src/steel_bootstrap.py
         sudo_user: vagrant
 
-      # need to use '.' since 'source' doesn't exist under /bin/sh
-      - name: update steelscript packages and app framework
+      - name: install steelscript development packages from github
         shell: >
-            . {{ virtualenv_devel }}/bin/activate && steel install -g --appfwk --develop -d /home/vagrant/src
-            chdir={{ project_home_devel }}
+            . {{ virtualenv_devel }}/bin/activate && python steel_bootstrap.py install -g --appfwk -d /home/vagrant/src
+            chdir={{ project_home_devel }}/src
         sudo_user: vagrant
 
       #
@@ -86,11 +84,6 @@
             insertafter=EOF
             state=present
 
-      - name: ipython notebook folder
-        file: path=/home/vagrant/ipython_notebooks
-            state=directory mode=775
-            owner=vagrant group=vagrant
-
       #
       # create development appfwk project
       #
@@ -107,6 +100,47 @@
             chdir={{ project_root_devel }}
             creates={{ project_root_devel}}/data/project.db
         sudo_user: vagrant
+
+      #
+      # setup apache certificates
+      #
+
+      - name: SSL ... make local cert directory
+        file: path=/etc/ssl/localcerts
+            state=directory mode=775
+            owner={{ project_owner_apache }} group={{ project_group_apache }}
+
+      - name: SSL ... install local signed cert pem
+        template: src=templates/ssl_apache/selfsignedcerts/apache_local.pem
+            dest=/etc/ssl/localcerts/apache_local.pem
+            mode=600
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: SSL ... install local signed cert key
+        template: src=templates/ssl_apache/selfsignedcerts/apache_local_nopass.key
+            dest=/etc/ssl/localcerts/apache_local.key
+            mode=600
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: SSL ... apache - update ports.conf
+        template: src=templates/ssl_apache/ports.conf
+            dest=/etc/apache2/ports.conf
+            mode=664
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: SSL ... apache - steelscript appfwk site template
+        template: src=templates/ssl_apache/steelscript_appfwk_site_ssl.j2
+            dest=/etc/apache2/sites-available/steelscript_appfwk_site
+            mode=664
+            owner=root group=root
+        notify:
+        - restart apache
 
       #
       # setup apache config
@@ -129,14 +163,6 @@
         pip: name={{item}} virtualenv={{ virtualenv_devel }}
         with_items:
             - MySQL-python
-
-      - name: apache - steelscript appfwk site template
-        template: src=templates/steelscript_appfwk_site.j2
-            dest=/etc/apache2/sites-available/steelscript_appfwk_site
-            mode=664
-            owner=root group=root
-        notify:
-        - restart apache
 
       - name: apache - enable appfwk site
         file: path=/etc/apache2/sites-enabled/001-steelscript_appfwk

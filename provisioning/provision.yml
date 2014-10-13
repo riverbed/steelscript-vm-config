@@ -48,26 +48,23 @@
             state=directory mode=775
             owner={{ project_owner_devel }} group={{ project_group_devel }}
 
-      - name: clone base steelscript repo
-        git: repo={{ steelscript_repo }}
-           dest={{ project_home_devel }}/src/steelscript
-           update=yes
-           force=yes
-        sudo_user: vagrant
-
-      # need to use '.' since 'source' doesn't exist under /bin/sh
+      # get latest bootstrap file
       - name: download steelscript bootstrap
         get_url: url=https://support.riverbed.com/apis/steelscript/_downloads/steel_bootstrap.py
             dest={{ project_home_devel }}/src/steel_bootstrap.py
         sudo_user: vagrant
 
-      - name: install steelscript development packages from github
+      - name: install steelscript development packages from Github
         shell: >
-            . {{ virtualenv_devel }}/bin/activate && python steel_bootstrap.py install -g --appfwk -d /home/vagrant/src
+            . {{ virtualenv_devel }}/bin/activate && python steel_bootstrap.py install -g --appfwk -d /home/vagrant/src --develop
             chdir={{ project_home_devel }}/src
         sudo_user: vagrant
 
       # Create scheduler directory - owned by root
+      - name: create scheduler directory
+        file: path={{ project_home_apache }}/scheduler
+            state=directory mode=775
+
       - name: copy scheduler.cfg
         template: src=templates/scheduler/scheduler.cfg
             dest={{ project_home_apache }}/scheduler/scheduler.cfg
@@ -150,6 +147,14 @@
         notify:
         - restart apache
 
+      #- name: apache - steelscript appfwk site template - non-ssl
+      #  template: src=templates/steelscript_appfwk_site.j2
+      #      dest=/etc/apache2/sites-available/steelscript_appfwk_site
+      #      mode=664
+      #      owner=root group=root
+      #  notify:
+      #  - restart apache
+
       - name: SSL ... apache - steelscript appfwk site template
         template: src=templates/ssl_apache/steelscript_appfwk_site_ssl.j2
             dest=/etc/apache2/sites-available/steelscript_appfwk_site
@@ -157,6 +162,15 @@
             owner=root group=root
         notify:
         - restart apache
+
+      - name: SSL ... enable apache ssl
+        shell: sudo a2enmod ssl
+            creates=/etc/apache2/mods-enabled/ssl.load
+
+      - name: SSL ... enable apache rewrite
+        shell: sudo a2enmod rewrite
+            creates=/etc/apache2/mods-enabled/rewrite.load
+
 
       #
       # setup apache config
@@ -311,6 +325,7 @@
         with_items:
           - /etc/update-motd.d/10-help-text
           - /etc/update-motd.d/91-release-upgrade
+        ignore_errors: true
 
       - name: add last provisioned message
         template: src=templates/motd_last_provisioned.sh
@@ -325,5 +340,3 @@
 
   handlers:
       - include: handlers.yml
-
-#- include: stage.yml reset=true

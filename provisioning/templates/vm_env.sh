@@ -21,13 +21,27 @@ alias cdwww='cd $PROJECT_APACHE_DIR'
 alias cdshared='cd /vagrant'
 
 alias appfwk_dev_server='cdproject && $PROJECT_DEV_VENV/bin/python $PROJECT_DEV_DIR/manage.py runserver `facter ipaddress`:8000'
-alias run_ipython_notebook='cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --pylab=inline'
+alias run_ipython_notebook='mkdir -p ~/ipython_notebooks && cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --pylab=inline'
 
 alias virtualenv_dev='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 alias virtualenv_www='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 
+# setup terminal options
+export TERM=xterm-256color
+
+
 # Activate virtual environment by default on login
 virtualenv_dev
+
+# Scheduler setup
+export SCHEDULER_DIR=/steelscript/scheduler
+alias start_scheduler='sudo supervisord -c /steelscript/scheduler/supervisord.conf'
+alias stop_scheduler='sudo kill `cat /steelscript/scheduler/supervisord.pid`'
+
+alias view_supervisor_log='sudo less $SCHEDULER_DIR/supervisord.log'
+alias view_scheduler_log='sudo less $SCHEDULER_DIR/scheduler.log'
+
+
 
 rotate_logs() {
     echo -n "Rotating apache logs ... "

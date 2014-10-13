@@ -67,6 +67,22 @@
             chdir={{ project_home_devel }}/src
         sudo_user: vagrant
 
+      # Create scheduler directory - owned by root
+      - name: copy scheduler.cfg
+        template: src=templates/scheduler/scheduler.cfg
+            dest={{ project_home_apache }}/scheduler/scheduler.cfg
+            mode=600
+
+      - name: copy supervisord.conf
+        template: src=templates/scheduler/supervisord.conf
+            dest={{ project_home_apache }}/scheduler/supervisord.conf
+            mode=600
+
+      - name: copy auth.txt
+        template: src=templates/scheduler/auth.txt
+            dest={{ project_home_apache }}/scheduler/auth.txt
+            mode=600
+
       #
       # setup enviroment for aliases, helper functions, and ipython notebooks
       #

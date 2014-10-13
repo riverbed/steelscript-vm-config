@@ -60,5 +60,6 @@ python_packages:
     - ipython
     - pysnmp
     - MySQL-python
+    - supervisor
 
 

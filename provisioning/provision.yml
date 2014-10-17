@@ -318,7 +318,7 @@
         service: name=apache2 state=started enabled=yes
 
       #
-      # update MOTD
+      # update MOTD and add LICENSE
       #
       - name: disable default motd
         file: path={{ item }} mode=0644
@@ -327,11 +327,29 @@
           - /etc/update-motd.d/91-release-upgrade
         ignore_errors: true
 
+      - name: update login text
+        template: src=templates/motd.tail
+            dest=/etc/motd.tail
+            mode=644
+            owner=root group=root
+
       - name: add last provisioned message
         template: src=templates/motd_last_provisioned.sh
             dest=/etc/update-motd.d/98-last-provisioned
             mode=755
             owner=root group=root
+
+      - name: copy readme
+        template: src=templates/README
+            dest=/home/vagrant/README
+            mode=644
+            owner=vagrant group=vagrant
+
+      - name: copy license
+        template: src=templates/LICENSE
+            dest=/home/vagrant/LICENSE
+            mode=644
+            owner=vagrant group=vagrant
 
       - name: store last provision date
         shell: echo This VM was last provisioned on `date` > /etc/vagrant_last_provisioned

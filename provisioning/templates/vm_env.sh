@@ -21,7 +21,7 @@ alias cdwww='cd $PROJECT_APACHE_DIR'
 alias cdshared='cd /vagrant'
 
 alias appfwk_dev_server='cdproject && $PROJECT_DEV_VENV/bin/python $PROJECT_DEV_DIR/manage.py runserver `facter ipaddress`:8000'
-alias run_ipython_notebook='mkdir -p ~/ipython_notebooks && cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --pylab=inline'
+alias run_ipython_notebook='mkdir -p ~/ipython_notebooks && cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --no-browser'
 
 alias virtualenv_dev='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 alias virtualenv_www='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
@@ -35,11 +35,15 @@ virtualenv_dev
 
 # Scheduler setup
 export SCHEDULER_DIR=/steelscript/scheduler
+export SUPERVISORD_LOG='$SCHEDULER_DIR/supervisord.log'
+export SCHEDULER_LOG='$SCHEDULER_DIR/scheduler.log'
+
+alias cdscheduler='cd $SCHEDULER_DIR'
 alias start_scheduler='sudo supervisord -c /steelscript/scheduler/supervisord.conf'
 alias stop_scheduler='sudo kill `cat /steelscript/scheduler/supervisord.pid`'
 
-alias view_supervisor_log='sudo less $SCHEDULER_DIR/supervisord.log'
-alias view_scheduler_log='sudo less $SCHEDULER_DIR/scheduler.log'
+alias view_supervisor_log='sudo less $SUPERVISORD_LOG'
+alias view_scheduler_log='sudo less $SCHEDULER_LOG'
 
 upgrade_packages_from_dir() {
     PKGDIR=$1
@@ -48,37 +52,6 @@ upgrade_packages_from_dir() {
         /home/vagrant/virtualenv/bin/pip install -U --no-deps $PKGDIR/$PKG
     done
     sudo apachectl restart
-}
-
-convert_steelscript_site_links() {
-    # update site symlinks to libary files from git repositories
-    USER=$1
-    SITE_DIR=$2
-
-    cd $SITE_DIR
-    sudo rm manage.py
-    sudo -u $USER ln -s /home/vagrant/virtualenv/lib/python2.7/site-packages/steelscript/appfwk/manage.py
-    sudo rm media
-    sudo -u $USER ln -s /home/vagrant/virtualenv/lib/python2.7/site-packages/steelscript/appfwk/media
-    sudo rm thirdparty
-    sudo -u $USER ln -s /home/vagrant/virtualenv/lib/python2.7/site-packages/steelscript/appfwk/thirdparty
-
-    sudo -u $USER /home/vagrant/virtualenv/bin/python manage.py collectstatic --noinput
-    sudo apachectl restart
-}
-
-convert_steelscript_pkgs() {
-    # this will migrate the developer-mode packages to sdist packages instead
-    # needed in order to install updates from source packages rather than
-    # github updates
-    CURDIR=`pwd`
-    PKGDIR=$1
-    upgrade_packages_from_dir $PKGDIR
-
-    convert_steelscript_site_links vagrant /home/vagrant/appfwk_project
-    convert_steelscript_site_links www-data /steelscript/www
-
-    cd $CURDIR
 }
 
 rotate_logs() {
@@ -108,9 +81,9 @@ appfwk_collect_logs() {
     LOGFILE=`ls -tr1 | grep debug | tail -1`
 
     if [[ -e /vagrant ]]; then
-        ZIPFILE=/vagrant/portal_logs_`date +%d%m%y-%H%M%S`.tar.gz
+        ZIPFILE=/vagrant/appfwk_logs_`date +%d%m%y-%H%M%S`.tar.gz
     else
-        ZIPFILE=~/portal_logs_`date +%d%m%y-%H%M%S`.tar.gz
+        ZIPFILE=~/appfwk_logs_`date +%d%m%y-%H%M%S`.tar.gz
     fi
 
     tar czf $ZIPFILE $LOGFILE $ERROR_LOG $ACCESS_LOG $PORTAL_LOG

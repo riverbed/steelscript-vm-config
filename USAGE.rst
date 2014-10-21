@@ -68,20 +68,25 @@ This Virtual Machine should be considered a demonstration platform and not a
 hardened and secure VM without additional configuration.  Areas which should be
 considered to improve security:
 
+   - Core OS
       - Change root password from 'vagrant'
       - Change vagrant user password from 'vagrant'
       - Remove and/or replace 'vagrant insecure public key' from
         vagrant/.ssh/authorized_keys
       - Update sudoers config (vagrant has passwordless sudo)
-      - Replace SSL certs
+   - Apache Server
+      - Replace self-signed SSL certs
           - located in /etc/ssl/localcerts/*
+      - Change root mysql password from 'vagrantRoot!'
+      - Change django database 'django_appfwk_db' password from
+        'djangoSteelScript!'
 
 Replacing SSL Certs
 +++++++++++++++++++
 
-As noted in the last item above, the apache server is configured to use HTTPS
-connections primarily to demonstrate the confugration approach.  The following
-certs are installed and should be replaced:
+As noted above, the apache server is configured to use HTTPS connections
+primarily to demonstrate the confugration approach.  The following certs are
+installed and should be replaced:
 
     SSLCertificateFile      /etc/ssl/localcerts/apache_local.pem
     SSLCertificateKeyFile   /etc/ssl/localcerts/apache_local.key
@@ -103,7 +108,16 @@ passcode removed:
 IPython Notebooks
 -----------------
 
-1. Once installed, login to the machine, and start a fresh IPython notebook instance:
+IPython is a python shell replacement that adds a lot of helpful features
+and shortcuts to make working with python much easier.  The Notebooks feature
+builds on top of that to add a web-based component allowing for a playground
+of sorts with the ability to re-run bits of python code easily while building
+up to more complicated functions.
+
+This Notebook configuration has been installed in the VM as well, and you can
+get started with it using a few short steps:
+
+1. Login to the machine, and start a fresh IPython notebook instance:
 
 .. code-block:: console
 
@@ -127,7 +141,7 @@ IPython Notebooks
 .. code-block:: console
 
         vagrant@precise32:~$ cd /usr/local/share/doc/ipython/examples/notebooks
-        vagrant@precise32:/usr/local/share/doc/ipython/examples/notebooks$ ipython notebook --ip=`facter ipaddress` --pylab=inline
+        vagrant@precise32:/usr/local/share/doc/ipython/examples/notebooks$ ipython notebook --ip=`facter ipaddress`
         [NotebookApp] Using existing profile dir: u'/home/vagrant/.ipython/profile_default'
         [NotebookApp] Serving notebooks from /usr/local/share/doc/ipython/examples/notebooks
         [NotebookApp] The IPython Notebook is running at: http://10.0.2.15:8888/
@@ -228,7 +242,7 @@ xkb-data, xml-core, xz-lzma, xz-utils, zlib1g, zlib1g-dev
 Added Ubuntu Packages
 ---------------------
 
-pache2.2-bin, apache2.2-common, apache2, apache2-mpm-worker, apache2-utils,
+apache2.2-bin, apache2.2-common, apache2, apache2-mpm-worker, apache2-utils,
 avahi-daemon, avahi-utils, blt, build-essential, curl, dpkg-dev,
 emacs23-bin-common, emacs23-common, emacs23, emacsen-common, emacs, fakeroot,
 fontconfig-config, fontconfig, g++-4.6, gconf2-common, gconf-service-backend,
@@ -240,42 +254,47 @@ libatk1.0-0, libatk1.0-data, libavahi-client3, libavahi-common3,
 libavahi-common-data, libavahi-core7, libblas3gf, libcairo2, libcap2-bin,
 libc-ares2, libcroco3, libcups2, libcurl3, libdaemon0, libdatrie1,
 libdbd-mysql-perl, libdbi-perl, libdpkg-perl, liberror-perl, libexpat1-dev,
-libfontconfig1, libfontenc1, libgconf-2-4, libgd2-noxpm, libgdk-pixbuf2.0-0,
-libgdk-pixbuf2.0-common, libgfortran3, libgif4, libgl1-mesa-dri,
-libgl1-mesa-glx, libglade2-0, libglapi-mesa, libgpm2, libgtk2.0-0,
-libgtk2.0-bin, libgtk2.0-common, libhtml-template-perl, libice6,
+libfontconfig1, libfontenc1, libfreetype6-dev, libgconf-2-4, libgd2-noxpm,
+libgdk-pixbuf2.0-0, libgdk-pixbuf2.0-common, libgfortran3, libgif4,
+libgl1-mesa-dri, libgl1-mesa-glx, libglade2-0, libglapi-mesa, libgpm2,
+libgtk2.0-0, libgtk2.0-bin, libgtk2.0-common, libhtml-template-perl, libice6,
 libjack-jackd2-0, libjasper1, libjpeg8, libjpeg-turbo8, libjs-jquery,
 libjs-jquery-ui, libjs-mathjax, libjs-underscore, liblapack3gf, liblcms1,
 libllvm3.0, liblua5.1-0, libm17n-0, libmysqlclient18, libmysqlclient-dev,
 libnet-daemon-perl, libnss-mdns, libotf0, libpam-cap, libpango1.0-0,
-libperl5.14, libpgm-5.1-0, libpixman-1-0, libplrpc-perl, libportaudio2,
-libpython2.7, librsvg2-2, libsamplerate0, libsensors4, libsm6, libsmi2ldbl,
-libsnmp15, libsnmp-base, libstdc++6-4.6-dev, libterm-readkey-perl, libthai0,
-libthai-data, libtiff4, libutempter0, libwireshark1, libwireshark-data,
-libwiretap1, libwsutil1, libx11-xcb1, libxaw7, libxcb-glx0, libxcb-render0,
-libxcb-shape0, libxcb-shm0, libxcomposite1, libxcursor1, libxdamage1,
-libxfixes3, libxft2, libxi6, libxinerama1, libxmu6, libxpm4, libxrandr2,
-libxrender1, libxss1, libxt6, libxtst6, libxv1, libxxf86dga1, libxxf86vm1,
-libzmq1, m17n-contrib, m17n-db, make, mysql-client-5.5, mysql-client-core-5.5,
-mysql-common, mysql-server-5.5, mysql-server-core-5.5, mysql-server, patch,
-python2.7-dev, python-cairo, python-configobj, python-crypto, python-dateutil,
-python-decorator, python-dev, python-glade2, python-gobject-2, python-gobject,
-python-gtk2, python-imaging, python-keyczar, python-matplotlib-data,
-python-matplotlib, python-mysqldb, python-nose, python-numpy, python-pexpect,
-python-pip, python-pkg-resources, python-pyasn1, python-pycurl,
-python-pyparsing, python-setuptools, python-simplegeneric, python-support,
-python-tk, python-tornado, python-tz, python-zmq, shared-mime-info, snmpd,
-snmp, sqlite3, squid-deb-proxy-client, ssl-cert, tcl8.5, tig, tk8.5, tshark,
-ttf-dejavu-core, ttf-lyx, vim, vim-runtime, wireshark-common, wireshark,
-wwwconfig-common, x11-common, x11-utils, xbitmaps, xterm
+libperl5.14, libpgm-5.1-0, libpixman-1-0, libplrpc-perl, libpng12-dev,
+libportaudio2, libpython2.7, librsvg2-2, libsamplerate0, libsensors4, libsm6,
+libsmi2ldbl, libsnmp15, libsnmp-base, libstdc++6-4.6-dev, libterm-readkey-perl,
+libthai0, libthai-data, libtiff4, libutempter0, libwireshark1,
+libwireshark-data, libwiretap1, libwsutil1, libx11-xcb1, libxaw7, libxcb-glx0,
+libxcb-render0, libxcb-shape0, libxcb-shm0, libxcomposite1, libxcursor1,
+libxdamage1, libxfixes3, libxft2, libxi6, libxinerama1, libxmu6, libxpm4,
+libxrandr2, libxrender1, libxss1, libxt6, libxtst6, libxv1, libxxf86dga1,
+libxxf86vm1, libzmq1, m17n-contrib, m17n-db, make, mysql-client-5.5,
+mysql-client-core-5.5, mysql-common, mysql-server-5.5, mysql-server-core-5.5,
+mysql-server, patch, python2.7-dev, python-cairo, python-configobj,
+python-crypto, python-dateutil, python-decorator, python-dev, python-glade2,
+python-gobject-2, python-gobject, python-gtk2, python-imaging, python-keyczar,
+python-matplotlib-data, python-matplotlib, python-mysqldb, python-nose,
+python-numpy, python-pexpect, python-pip, python-pkg-resources, python-pyasn1,
+python-pycurl, python-pyparsing, python-setuptools, python-simplegeneric,
+python-support, python-tk, python-tornado, python-tz, python-zmq,
+shared-mime-info, snmpd, snmp, sqlite3, squid-deb-proxy-client, ssl-cert,
+tcl8.5, tig, tk8.5, tshark, ttf-dejavu-core, ttf-lyx, vim, vim-runtime,
+wireshark-common, wireshark, wwwconfig-common, x11-common, x11-utils, xbitmaps,
+xterm
 
 Python Packages (with version numbers)
 --------------------------------------
-
-ngo==1.5.10
+Django==1.5.10
+Jinja2==2.7.3
+MarkupSafe==0.23
 MySQL-python==1.2.5
-ansi2html==1.0.6
+Pygments==1.6
+Sphinx==1.2.3
+ansi2html==1.0.7
 argparse==1.2.1
+backports.ssl-match-hostname==3.4.0.2
 certifi==14.05.14
 django-ace==1.0.1
 django-admin-tools==0.5.1
@@ -283,15 +302,29 @@ django-announcements==1.2.0
 django-extensions==1.3.7
 django-model-utils==2.0.3
 djangorestframework==2.3.13
+docutils==0.12
 importlib==1.0.3
+ipython==2.3.0
 jsonfield==0.9.20
+matplotlib==1.4.1
+mock==1.0.1
+nose==1.3.4
 numpy==1.8.2
+numpydoc==0.5
 pandas==0.13.1
 pygeoip==0.3.1
+pyparsing==2.0.3
 python-dateutil==2.2
 pytz==2014.7
-requests==2.4.0
-six==1.7.3
-tzlocal==1.1.1
+pyzmq==14.4.0
+requests==2.4.3
+six==1.8.0
+steelscript==0.9.4
+steelscript.appfwk==0.9.5
+steelscript.appfwk.business-hours==0.9.2
+steelscript.netprofiler==0.9.3
+steelscript.netshark==0.9.3
+steelscript.wireshark==0.9.3
+tornado==4.0.2
+tzlocal==1.1.2
 wsgiref==0.1.2
-

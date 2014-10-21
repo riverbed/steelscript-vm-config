@@ -24,7 +24,7 @@
             state=latest
 
       - name: install python system packages
-        easy_install: name={{item}}
+        easy_install: name={{ item }}
         with_items: python_packages
 
       - name: install virtualenv
@@ -54,10 +54,17 @@
             dest={{ project_home_devel }}/src/steel_bootstrap.py
         sudo_user: vagrant
 
-      - name: install steelscript development packages from Github
-        shell: >
-            . {{ virtualenv_devel }}/bin/activate && python steel_bootstrap.py install -g --appfwk -d /home/vagrant/src --develop
-            chdir={{ project_home_devel }}/src
+      - name: install steelscript packages and dependencies
+        pip: name={{ item }}
+            virtualenv={{ virtualenv_devel }}
+        with_items: steelscript_packages
+        sudo_user: vagrant
+
+      - name: clone steelscript repositories
+        git: repo=https://github.com/riverbed/{{ item }}.git
+            dest=/home/vagrant/src/{{ item }}
+            update=no
+        with_items: steelscript_repos
         sudo_user: vagrant
 
       # Create scheduler directory - owned by root
@@ -83,6 +90,14 @@
       #
       # setup enviroment for aliases, helper functions, and ipython notebooks
       #
+      - name: install ipython notebook into virtualenv
+        pip: name={{ item }}
+            virtualenv={{ virtualenv_devel }}
+        with_items:
+            - ipython[all]
+            - matplotlib
+        sudo_user: vagrant
+
       - name: steelscript helper functions and aliases
         template: src=templates/vm_env.sh
             dest={{ project_home_devel }}/.vm_env.sh

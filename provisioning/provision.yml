@@ -87,6 +87,11 @@
             dest={{ project_home_apache }}/scheduler/auth.txt
             mode=600
 
+      - name: copy scheduler boot toogle script
+        template: src=templates/scheduler/toggle_scheduler.py
+            dest=/usr/local/bin/toggle_scheduler
+            mode=755
+
       #
       # setup enviroment for aliases, helper functions, and ipython notebooks
       #

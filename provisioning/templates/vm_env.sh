@@ -35,8 +35,8 @@ virtualenv_dev
 
 # Scheduler setup
 export SCHEDULER_DIR=/steelscript/scheduler
-export SUPERVISORD_LOG='$SCHEDULER_DIR/supervisord.log'
-export SCHEDULER_LOG='$SCHEDULER_DIR/scheduler.log'
+export SUPERVISORD_LOG=$SCHEDULER_DIR/supervisord.log
+export SCHEDULER_LOG=$SCHEDULER_DIR/scheduler.log
 
 alias cdscheduler='cd $SCHEDULER_DIR'
 alias start_scheduler='sudo supervisord -c /steelscript/scheduler/supervisord.conf'

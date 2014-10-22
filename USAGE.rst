@@ -12,26 +12,81 @@ along with important security considerations should you deploy this VM
 within your network.
 
 
+SteelScript Virtualenv
+----------------------
+
+A virtualenv has been created with SteelScript and all of its dependencies
+already installed in the folder ``/home/vagrant/virtualenv``.  When logging in
+as the default 'vagrant' user, this virtualenv will be automatically activated,
+and can always be reactivated by using the included alias ``virtualenv_dev``.
+
+
 SteelScript Application Framework
 ---------------------------------
 
-1. On your host machine, head to the URL
-   `https://127.0.0.1:30443 <https://127.0.0.1:30443>`_ and after accepting
-   the self-signed certificate the portal should appear!
-2. You will see a page with form fields for a profiler and shark appliance,
-   fill out the IP address/port and Username/Password for each appliance
-3. Click the "Reports" button on the navigation bar, and run a report!
+Two separate App Framework projects are included with this VM: one using the
+Apache webserver, mysql backend database and started at boot time, and another
+for more development-oriented use.
 
-To customize the reports that are available and take a peek under the hood, you
-can ssh directly into the VM and look at each of the report files:
+The projects can be found in the following locations:
 
-.. code-block:: console
+===================== =====================================
+Project               Directory location
+===================== =====================================
+Apache project        ``/steelscript/www``
+Development project   ``/home/vagrant/appfwk_project``
+===================== =====================================
 
-        $ vagrant ssh
-        vagrant@precise32:~$ cd /steelscript/steepscript_appfwk/config/reports
 
-Changes and edits can now easily be made in the staging area without the need for
-sudo'ing or worrying about permissions.
+Apache App Framework Project
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To access the running Apache App Framework project, use these steps:
+
+1. On your host machine, visit the URL
+   `https://127.0.0.1:30443 <https://127.0.0.1:30443>`_, and after accepting
+   the self-signed certificate you should see the login screen.
+2. Enter the default credentials of `admin` / `admin` to login.
+3. Next, you will see the "Edit Devices" page.  Here you can add the
+   credentials for one or more Riverbed devices by filling out the IP
+   address/port and Username/Password for each appliance you wish
+   to run reports against.
+4. Choose a report from the "Reports" drop down list, and run a report!
+
+To navigate to the project folder, you can use the built-in alias of
+``cdwww``.  All the files should be readable by the vagrant user,
+but note they are all owned by the Apache user ``www-data``.  Take care
+to ensure all files remain owned by that user should any edits take place.
+To help cleanup permissions, the bash function ``appfwk_clean_perms`` will
+come in handy.
+
+For simple edits to reports, its even easier to use the web-based editor
+found under the blue drop-down menu called "Edit Report". This will
+be visible when viewing any report page.
+
+If any edits to the project or python packages have been made, you may need to
+restart the server for them to take effect, use the following command:
+``sudo apachectl restart``.
+
+
+Development App Framework Project
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The development pre-configured project is located in the user's home directory,
+and can be started using the shortcut ``appfwk_dev_server``.
+
+A key benefit of this project are the less strict permissions on the files.  It
+can be much easier to edit some of the configurations and reports in this
+project, test it out with the dev server, and iterate that pattern than trying
+the same thing with the Apache project which requires careful use of ``sudo``
+and permissions updates.
+
+Once certain changes have been validated in the dev server, its a simple matter
+to make the same changes to the Apache project in one go.
+
+
+Aliases and Shortcuts
+---------------------
 
 A summary of included aliases and commands:
 
@@ -81,11 +136,12 @@ considered to improve security:
       - Change django database 'django_appfwk_db' password from
         'djangoSteelScript!'
 
+
 Replacing SSL Certs
-+++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^
 
 As noted above, the apache server is configured to use HTTPS connections
-primarily to demonstrate the confugration approach.  The following certs are
+primarily to demonstrate the configuration approach.  The following certs are
 installed and should be replaced:
 
     SSLCertificateFile      /etc/ssl/localcerts/apache_local.pem

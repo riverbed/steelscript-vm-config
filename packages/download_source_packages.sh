@@ -20,7 +20,7 @@ download() {
 
     for pkg in `cat $PKGLIST | awk '{ print $1 }'`; do
         echo "===== Package: $pkg ====="
-        apt-get source $pkg
+        apt-get source -d $pkg
     done
 
     cd $BASEDIR
@@ -43,6 +43,9 @@ if [ ! -e pkglists/pkgs_newly_installed.txt ]; then
 else
     echo "pkglists already generated ... skipping to download."
 fi
+
+SOURCEDIR=`pwd`/source_downloads
+cd $SOURCEDIR
 
 ## DOWNLOAD BASE PACKAGES
 DIR=sources-base-packages

@@ -25,24 +25,7 @@ To download all of the sources yourself, copy the whole
     $ cd image-sources
     $ cp -r /vagrant/packages/* .
 
-Next you can optionally install all of the keys used to sign
-the source packages using two helper scripts.  This process
-hasn't been fully validated, but does get a majority of the
-keys installed as trusted to ensure that the signatures of
-the source packages can be validated.
-
-To install the keys, run the following scripts::
-
-    $ sudo ./add_keyrings.sh
-    $ ./add_trusted_keys.sh
-
-This process will take a while, up to an hour in one tested case.
-
-Note that the first must be done as root (via sudo) and the
-second should be done as the unprivileged user.
-
-Next, whether you installed the keys or not, to download
-all of the packages run the following script::
+Next, download all of the packages with the following script::
 
     $ ./download_source_packages.sh
 

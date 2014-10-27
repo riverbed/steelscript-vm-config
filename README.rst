@@ -72,7 +72,7 @@ Installation
 Usage and Configuration
 -----------------------
 
-[See the usage document](USAGE.rst) for a description of the layout and
+`See the usage document <USAGE.rst>`_ for a description of the layout and
 configuration of the SteelScript VM along with important security
 considerations should you deploy this VM within your network.
 

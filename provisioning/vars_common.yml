@@ -42,6 +42,7 @@ steelscript_repos:
 system_packages:
     # core packages
     - build-essential
+    - man-db
     - git-core
     - vim
     - tig

@@ -60,7 +60,7 @@ to ensure all files remain owned by that user should any edits take place.
 To help cleanup permissions, the bash function ``appfwk_clean_perms`` will
 come in handy.
 
-For simple edits to reports, its even easier to use the web-based editor
+For simple edits to reports, it's even easier to use the web-based editor
 found under the blue drop-down menu called "Edit Report". This will
 be visible when viewing any report page.
 
@@ -75,13 +75,13 @@ Development App Framework Project
 The development pre-configured project is located in the user's home directory,
 and can be started using the shortcut ``appfwk_dev_server``.
 
-A key benefit of this project are the less strict permissions on the files.  It
+A key benefit of this project is the less strict permissions on the files.  It
 can be much easier to edit some of the configurations and reports in this
 project, test it out with the dev server, and iterate that pattern than trying
 the same thing with the Apache project which requires careful use of ``sudo``
-and permissions updates.
+and permission updates.
 
-Once certain changes have been validated in the dev server, its a simple matter
+Once certain changes have been validated in the dev server, it's a simple matter
 to make the same changes to the Apache project in one go.
 
 
@@ -95,14 +95,14 @@ Aliases / Functions       Description
 ========================= ==========================================================================
 ``view_err_log``          show the apache error log
 ``view_access_log``       show the apache access log
-``view_portal_log``       show the portal debug log
+``view_project_log``      show the apache server log
 
 ``cdproject``             shortcut to `cd /home/vagrant/steelscript_appfwk`, the staging directory
 ``cdwww``                 shortcut to `cd /steelscript/www`, the deployed directory
 ``cdshared``              shortcut to `cd /vagrant`, the shared directory with the host machine.
                           This can be a convenient way to share files between the guest and host.
 
-``run_ipython_notebooks`` shortcut to run ipython notebook server (documented below)
+``run_ipython_notebook``  shortcut to run ipython notebook server (documented below)
 ``appfwk_dev_server``     shortcut to run the django development server in the staging directory
 ``appfwk_collect_logs``   collects and zips up all the appropriate logs to help with
                           debugging VM or App Framework issues.
@@ -113,7 +113,7 @@ Aliases / Functions       Description
 For further information, see the following descriptions about App Framework and how to
 customize it:
 
-    `SteelScript App Framework on GitHub <https://github.com/riverbed/steelscript-app-fmwk>`_
+    `SteelScript App Framework on GitHub <https://github.com/riverbed/steelscript-appfwk>`_
 
 
 Security Considerations
@@ -121,7 +121,7 @@ Security Considerations
 
 This Virtual Machine should be considered a demonstration platform and not a
 hardened and secure VM without additional configuration.  Areas which should be
-considered to improve security:
+considered to improve security are:
 
    - Core OS
       - Change root password from 'vagrant'
@@ -144,8 +144,8 @@ As noted above, the apache server is configured to use HTTPS connections
 primarily to demonstrate the configuration approach.  The following certs are
 installed and should be replaced:
 
-    SSLCertificateFile      /etc/ssl/localcerts/apache_local.pem
-    SSLCertificateKeyFile   /etc/ssl/localcerts/apache_local.key
+   - SSLCertificateFile      /etc/ssl/localcerts/apache_local.pem
+   - SSLCertificateKeyFile   /etc/ssl/localcerts/apache_local.key
 
 Instructions on creating a new self-signed cert can be found at the following
 link.  Only Step 2 will be required as the other steps have already taken
@@ -158,7 +158,9 @@ may require manually restarting Apache each time. If you'd prefer to remove
 that requirement the following command will create a clone of the key with the
 passcode removed:
 
-    $ sudo openssl rsa -in apache_local.key -out apache_local_nopass.key
+.. code-block:: console
+
+        $ sudo openssl rsa -in apache_local.key -out apache_local_nopass.key
 
 
 IPython Notebooks
@@ -208,7 +210,7 @@ get started with it using a few short steps:
    example scripts you can walk through. You won't be able to save changes
    here, but that should make experimentation a little easier too.
 
-Note: this notebook will be accessible to anyone on your LAN, if additional
+Note: this notebook will be accessible to anyone on your LAN. If additional
 security is required, learn more about adding passwords and encryption
 `here in the documentation <http://ipython.org/ipython-doc/dev/interactive/htmlnotebook.html#security>`_.
 

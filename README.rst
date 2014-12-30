@@ -1,4 +1,4 @@
-SteelScript VM README
+SteelScript VM Config
 =====================
 
 Command-line Python Development Environment with SteelScript
@@ -72,7 +72,7 @@ Installation
 Usage and Configuration
 -----------------------
 
-`See the usage document <USAGE.rst>`_ for a description of the layout and
-configuration of the SteelScript VM along with important security
-considerations should you deploy this VM within your network.
+`See the usage document <https://support.riverbed.com/apis/steelscript/vmconfig/usage.html>`_
+for a description of the layout and configuration of the SteelScript VM along with important
+security considerations should you deploy this VM within your network.
 

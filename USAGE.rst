@@ -113,7 +113,7 @@ Aliases / Functions       Description
 For further information, see the following descriptions about App Framework and how to
 customize it:
 
-    `SteelScript App Framework on GitHub <https://github.com/riverbed/steelscript-appfwk>`_
+    `SteelScript App Framework Documentation <https://support.riverbed.com/apis/steelscript/appfwk/overview.html>`_
 
 
 Security Considerations
@@ -222,10 +222,10 @@ This Virtual Machine was built using an Ubuntu 12.04 Precise base image,
 with additional Ubuntu packages installed from the Ubuntu repository.
 On top of this image, python packages and additional configuration was made.
 
-A complete archive of the source code is available at the support site at
-the following location:
+A complete archive of the source code is available at the support site,
+and the latest version can be found at the following location:
 
-    https://TODO_ADD_ME
+    https://splash.riverbed.com/docs/DOC-4860
 
 A list of the installed packages is below, broken into categories of
 initial base image packages, added packages from Ubuntu, and python packages

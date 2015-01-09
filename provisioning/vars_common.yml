@@ -30,6 +30,8 @@ steelscript_packages:
     - steelscript.netprofiler
     - steelscript.netshark
     - steelscript.wireshark
+    - steelscript.cmdline
+    - steelscript.steelhead
 
 steelscript_repos:
     - steelscript
@@ -38,6 +40,8 @@ steelscript_repos:
     - steelscript-netprofiler
     - steelscript-netshark
     - steelscript-wireshark
+    - steelscript-cmdline
+    - steelscript-steelhead
 
 system_packages:
     # core packages
@@ -74,6 +78,7 @@ system_packages:
     - apache2
     - ssl-cert
     - libapache2-mod-wsgi
+    - unzip
 
 python_packages:
     - pip

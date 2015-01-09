@@ -48,12 +48,6 @@
             state=directory mode=775
             owner={{ project_owner_devel }} group={{ project_group_devel }}
 
-      # get latest bootstrap file
-      - name: download steelscript bootstrap
-        get_url: url=https://support.riverbed.com/apis/steelscript/_downloads/steel_bootstrap.py
-            dest={{ project_home_devel }}/src/steel_bootstrap.py
-        sudo_user: vagrant
-
       - name: install steelscript packages and dependencies
         pip: name={{ item }}
             virtualenv={{ virtualenv_devel }}
@@ -281,7 +275,7 @@
 
       - name: apache - create app framework project directory
         shell: >
-            . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_apache }}
+            . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_apache }} --offline-js
             chdir={{ project_home_apache }}
             creates={{ project_root_apache }}
         sudo_user: www-data

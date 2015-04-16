@@ -24,9 +24,30 @@ mysql_django_db: django_appfwk_db
 mysql_django_user: django_appfwk
 mysql_django_password: djangoSteelScript!
 
+steelscript_packages:
+    - steelscript
+    - steelscript.appfwk
+    - steelscript.appfwk.business-hours
+    - steelscript.netprofiler
+    - steelscript.netshark
+    - steelscript.wireshark
+    - steelscript.cmdline
+    - steelscript.steelhead
+
+steelscript_repos:
+    - steelscript
+    - steelscript-appfwk
+    - steelscript-appfwk-business-hours
+    - steelscript-netprofiler
+    - steelscript-netshark
+    - steelscript-wireshark
+    - steelscript-cmdline
+    - steelscript-steelhead
+
 system_packages_debian:
     # core packages
     - build-essential
+    - man-db
     - git-core
     - vim
     - tig
@@ -54,9 +75,13 @@ system_packages_debian:
     - python-ldap
     - ipython-notebook
     - python-nose
+    - libpng12-dev
+    - libfreetype6-dev
     # web server packages
     - apache2
+    - ssl-cert
     - libapache2-mod-wsgi
+    - unzip
 
 system_packages_redhat:
     # core packages
@@ -106,5 +131,6 @@ python_packages:
       #- ipython
     - pysnmp
     - MySQL-python
+    - supervisor
 
 

@@ -1,0 +1,10 @@
+#!/bin/zsh
+
+for d in `ls | grep "^steelscript"`; do 
+    #NAME=$(grep \'name\' setup.py | cut -d\' -f4)
+    echo "*********\n$d" 
+    cd $d 
+    git $*
+    cd ..
+done
+

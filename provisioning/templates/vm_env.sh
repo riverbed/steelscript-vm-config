@@ -21,13 +21,38 @@ alias cdwww='cd $PROJECT_APACHE_DIR'
 alias cdshared='cd /vagrant'
 
 alias appfwk_dev_server='cdproject && $PROJECT_DEV_VENV/bin/python $PROJECT_DEV_DIR/manage.py runserver `facter ipaddress`:8000'
-alias run_ipython_notebook='cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --pylab=inline'
+alias run_ipython_notebook='mkdir -p ~/ipython_notebooks && cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --no-browser'
 
 alias virtualenv_dev='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 alias virtualenv_www='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 
+# setup terminal options
+export TERM=xterm-256color
+
+
 # Activate virtual environment by default on login
 virtualenv_dev
+
+# Scheduler setup
+export SCHEDULER_DIR=/steelscript/scheduler
+export SUPERVISORD_LOG=$SCHEDULER_DIR/supervisord.log
+export SCHEDULER_LOG=$SCHEDULER_DIR/scheduler.log
+
+alias cdscheduler='cd $SCHEDULER_DIR'
+alias start_scheduler='sudo supervisord -c /steelscript/scheduler/supervisord.conf'
+alias stop_scheduler='sudo kill `cat /steelscript/scheduler/supervisord.pid`'
+
+alias view_supervisor_log='sudo less $SUPERVISORD_LOG'
+alias view_scheduler_log='sudo less $SCHEDULER_LOG'
+
+upgrade_packages_from_dir() {
+    PKGDIR=$1
+
+    for PKG in `ls $PKGDIR`; do
+        /home/vagrant/virtualenv/bin/pip install -U --no-deps $PKGDIR/$PKG
+    done
+    sudo apachectl restart
+}
 
 rotate_logs() {
     echo -n "Rotating apache logs ... "
@@ -56,9 +81,9 @@ appfwk_collect_logs() {
     LOGFILE=`ls -tr1 | grep debug | tail -1`
 
     if [[ -e /vagrant ]]; then
-        ZIPFILE=/vagrant/portal_logs_`date +%d%m%y-%H%M%S`.tar.gz
+        ZIPFILE=/vagrant/appfwk_logs_`date +%d%m%y-%H%M%S`.tar.gz
     else
-        ZIPFILE=~/portal_logs_`date +%d%m%y-%H%M%S`.tar.gz
+        ZIPFILE=~/appfwk_logs_`date +%d%m%y-%H%M%S`.tar.gz
     fi
 
     tar czf $ZIPFILE $LOGFILE $ERROR_LOG $ACCESS_LOG $PORTAL_LOG

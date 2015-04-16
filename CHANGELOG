@@ -1,0 +1,70 @@
+CHANGELOG
+=========
+
+[0.9.4]
+ * Single network interface, and update vmware config
+ * Add tshark path to settings
+ * Add steelhead and cmdline to steelscript pkg lists for vm
+ * Add option --offline-js to apache appfwk project so that users can use 3rd party js libraries without internet
+ * Cleanup steelscript install
+ * Update documentation
+
+[0.9.3]
+ * Update documentation and add README and USAGE documents
+ * Convert apache site to use SSL
+ * Add upgrade and convert functions to vm_env
+ * Add scheduler template files and supervisord config
+ * Include tools to download pkg sources for all installed packages
+
+[0.9.2]
+ * Ensure services start on boot, fix apache project dirs
+ * Update clean_perms alias, activate venv on login
+ * Add syslog option for production template
+
+[0.9.1]
+ * Update docs to rst, update aliases
+ * Avoid root ownership for virtualenv and git repos
+ * Added overview page for docs
+ * Update headers, 2014
+ * Update README
+ * Refactor for App Framework mkprojects
+ * Rebuild VMWare tools after upgrade
+ * Add VMWare provider option
+ * Update docs
+ * Reconfigure for SteelScript App Framework
+ * Default to single CPU
+ * Update support for latest Portal versions
+ * A few minor tweaks to explicitly pick older compatible versions of packages
+ * Ensure vagrant keys have proper permissions
+ * Fix windows installation script
+ * Update installation instructions
+ * Add support for running on Windows host
+ * Rename apache site config
+ * Make local deploy actually work
+ * Add local deploy functionality via vmconfig script
+ * Add portal_ prefix to many aliases and functions
+ * Clean up shell aliases
+ * Update to jinja2-style variables
+ * Working stage and deploy
+ * add vagrant insecure keypair
+ * remove puppet configs
+ * Add support for provisioning and deployment
+ * Use https instead of git for git clone cmd
+ * Add portal support for ansible playbook
+ * Initial switch to ansible provisioner
+ * Change pandas to use version "0.10.1"
+ * Add Wireshark package
+ * Add snmpd package, update pandas to latest version
+ * Add pysnmp package
+ * Improve portal configuration, add optional proxy to Vagrantfile
+ * Add alternate download path for pip installs
+ * Change initialization command to avoid errors on first run
+ * Add LICENSE file and copyright headers
+ * Remove minor packages
+ * Reorganize and update dependencies
+ * Remove postgresql package
+ * Remove settings.py
+ * Integrated FlyScript Portal
+ * Add requirements for FlyScript Dashboard
+ * Refactor puppet manifest, add port forwards for web services
+ * Initial working package set

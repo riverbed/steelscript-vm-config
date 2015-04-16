@@ -20,20 +20,32 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider :vmware_fusion do |v, override|
       v.vmx["numvcpus"] = "2"
-      v.vmx["memsize"] = "512"
+      v.vmx["memsize"] = "1024"
   end
 
   # setup ip to match ansible_hosts file
   #config.vm.network :private_network, type: :dhcp
   config.vm.network :forwarded_port, guest:80, host: 30080
+  config.vm.network :forwarded_port, guest:443, host: 30443
   config.vm.network :forwarded_port, guest:8000, host: 38000
   config.vm.network :forwarded_port, guest:8888, host: 38888
+
+  # avoid root mesg issues from https://github.com/mitchellh/vagrant/issues/1673
+  config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+
+  config.vm.provision :shell do |s|
+      s.inline = "F=/vagrant/packages/installed_pkgs_pre_provision.txt && if [ ! -e $F ]; then  dpkg --get-selections > $F; fi"
+  end
 
   config.vm.provision :ansible do |ansible|
       ansible.sudo = true
       ansible.playbook = "provisioning/provision.yml"
       ansible.verbose = true
       #ansible.verbose = "vvvv"
+  end
+
+  config.vm.provision :shell do |s|
+      s.inline = "F=/vagrant/packages/installed_pkgs_post_provision.txt && if [ ! -e $F ]; then dpkg --get-selections > $F; /home/vagrant/virtualenv/bin/pip freeze | grep -v ^-e > /vagrant/packages/installed_pkgs_python.txt; fi"
   end
 
 end

@@ -12,7 +12,7 @@
         with_items: system_packages
 
       - name: install python system packages
-        easy_install: name={{item}}
+        easy_install: name={{ item }}
         with_items: python_packages
 
       - name: install virtualenv
@@ -36,30 +36,55 @@
             state=directory mode=775
             owner={{ project_owner_devel }} group={{ project_group_devel }}
 
-      - name: clone base steelscript repo
-        git: repo={{ steelscript_repo }}
-           dest={{ project_home_devel }}/src/steelscript
-           update=yes
-           force=yes
+      - name: install steelscript packages and dependencies
+        pip: name={{ item }}
+            virtualenv={{ virtualenv_devel }}
+        with_items: steelscript_packages
         sudo_user: vagrant
 
-      # need to use '.' since 'source' doesn't exist under /bin/sh
-      - name: update base steelscript
-        shell: >
-            . {{ virtualenv_devel }}/bin/activate && python setup.py develop
-            chdir={{ project_home_devel }}/src/steelscript
+      - name: clone steelscript repositories
+        git: repo=https://github.com/riverbed/{{ item }}.git
+            dest=/home/vagrant/src/{{ item }}
+            update=no
+        with_items: steelscript_repos
         sudo_user: vagrant
 
-      # need to use '.' since 'source' doesn't exist under /bin/sh
-      - name: update steelscript packages and app framework
-        shell: >
-            . {{ virtualenv_devel }}/bin/activate && steel install -g --appfwk --develop -d /home/vagrant/src
-            chdir={{ project_home_devel }}
-        sudo_user: vagrant
+      # Create scheduler directory - owned by root
+      - name: create scheduler directory
+        file: path={{ project_home_apache }}/scheduler
+            state=directory mode=775
+
+      - name: copy scheduler.cfg
+        template: src=templates/scheduler/scheduler.cfg
+            dest={{ project_home_apache }}/scheduler/scheduler.cfg
+            mode=600
+
+      - name: copy supervisord.conf
+        template: src=templates/scheduler/supervisord.conf
+            dest={{ project_home_apache }}/scheduler/supervisord.conf
+            mode=600
+
+      - name: copy auth.txt
+        template: src=templates/scheduler/auth.txt
+            dest={{ project_home_apache }}/scheduler/auth.txt
+            mode=600
+
+      - name: copy scheduler boot toogle script
+        template: src=templates/scheduler/toggle_scheduler.py
+            dest=/usr/local/bin/toggle_scheduler
+            mode=755
 
       #
       # setup enviroment for aliases, helper functions, and ipython notebooks
       #
+      - name: install ipython notebook into virtualenv
+        pip: name={{ item }}
+            virtualenv={{ virtualenv_devel }}
+        with_items:
+            - ipython[all]
+            - matplotlib
+        sudo_user: vagrant
+
       - name: steelscript helper functions and aliases
         template: src=templates/vm_env.sh
             dest={{ project_home_devel }}/.vm_env.sh
@@ -73,11 +98,6 @@
             regexp="^source ~/.vm_env.sh"
             insertafter=EOF
             state=present
-
-      - name: ipython notebook folder
-        file: path=/home/vagrant/ipython_notebooks
-            state=directory mode=775
-            owner=vagrant group=vagrant
 
       #
       # create development appfwk project
@@ -95,6 +115,64 @@
             chdir={{ project_root_devel }}
             creates={{ project_root_devel}}/data/project.db
         sudo_user: vagrant
+
+      #
+      # setup apache certificates
+      #
+
+      - name: SSL ... make local cert directory
+        file: path=/etc/ssl/localcerts
+            state=directory mode=775
+            owner={{ project_owner_apache }} group={{ project_group_apache }}
+
+      - name: SSL ... install local signed cert pem
+        template: src=templates/ssl_apache/selfsignedcerts/apache_local.pem
+            dest=/etc/ssl/localcerts/apache_local.pem
+            mode=600
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: SSL ... install local signed cert key
+        template: src=templates/ssl_apache/selfsignedcerts/apache_local_nopass.key
+            dest=/etc/ssl/localcerts/apache_local.key
+            mode=600
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: SSL ... apache - update ports.conf
+        template: src=templates/ssl_apache/ports.conf
+            dest=/etc/apache2/ports.conf
+            mode=664
+            owner=root group=root
+        notify:
+        - restart apache
+
+      #- name: apache - steelscript appfwk site template - non-ssl
+      #  template: src=templates/steelscript_appfwk_site.j2
+      #      dest=/etc/apache2/sites-available/steelscript_appfwk_site
+      #      mode=664
+      #      owner=root group=root
+      #  notify:
+      #  - restart apache
+
+      - name: SSL ... apache - steelscript appfwk site template
+        template: src=templates/ssl_apache/steelscript_appfwk_site_ssl.j2
+            dest=/etc/apache2/sites-available/steelscript_appfwk_site
+            mode=664
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: SSL ... enable apache ssl
+        shell: sudo a2enmod ssl
+            creates=/etc/apache2/mods-enabled/ssl.load
+
+      - name: SSL ... enable apache rewrite
+        shell: sudo a2enmod rewrite
+            creates=/etc/apache2/mods-enabled/rewrite.load
+
 
       #
       # setup apache config
@@ -201,7 +279,7 @@
 
       - name: apache - create app framework project directory
         shell: >
-            . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_apache }}
+            . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_apache }} --offline-js
             chdir={{ project_home_apache }}
             creates={{ project_root_apache }}
         #sudo_user: "{{ project_owner_apache }}"
@@ -255,9 +333,44 @@
             owner={{ project_owner_apache }} group={{ project_group_apache }}
             recurse=yes
 
+      #
+      # update MOTD and add LICENSE
+      #
+      - name: disable default motd
+        file: path={{ item }} mode=0644
+        with_items:
+          - /etc/update-motd.d/10-help-text
+          - /etc/update-motd.d/91-release-upgrade
+        ignore_errors: true
+
+      - name: update login text
+        template: src=templates/motd.tail
+            dest=/etc/motd.tail
+            mode=644
+            owner=root group=root
+
+      - name: add last provisioned message
+        template: src=templates/motd_last_provisioned.sh
+            dest=/etc/update-motd.d/98-last-provisioned
+            mode=755
+            owner=root group=root
+
+      - name: copy readme
+        template: src=templates/README
+            dest=/home/vagrant/README
+            mode=644
+            owner=vagrant group=vagrant
+
+      - name: copy license
+        template: src=templates/LICENSE
+            dest=/home/vagrant/LICENSE
+            mode=644
+            owner=vagrant group=vagrant
+
+      - name: store last provision date
+        shell: echo This VM was last provisioned on `date` > /etc/vagrant_last_provisioned
+
       - meta: flush_handlers
 
   handlers:
       - include: handlers.yml
-
-#- include: stage.yml reset=true

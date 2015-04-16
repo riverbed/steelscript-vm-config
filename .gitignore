@@ -7,3 +7,4 @@
 
 .vagrant
 vagrant_ansible_inventory_default
+packages/installed_pkgs_*

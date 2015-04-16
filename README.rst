@@ -4,6 +4,14 @@ SteelScript VM Config
 Command-line Python Development Environment with SteelScript
 
 
+
+Introduction
+------------
+
+This document describes how to build your own SteelScript Virtual Machine
+using pre-defined templates and helpful automation tools.
+
+
 Requirements
 ------------
 
@@ -61,91 +69,10 @@ Installation
    Application Framework and IPython Notebooks ready.
 
 
-SteelScript Application Framework
----------------------------------
+Usage and Configuration
+-----------------------
 
-1. On your host machine, head to the URL
-   `http://127.0.0.1:30080 <http://127.0.0.1:30080>`_ and the portal should
-   appear!
-2. You will see a page with form fields for a profiler and shark appliance,
-   fill out the IP address/port and Username/Password for each appliance
-3. Click the "Reports" button on the navigation bar, and run a report!
-
-To customize the reports that are available and take a peek under the hood, you
-can ssh directly into the VM and look at each of the report files:
-
-.. code-block:: console
-
-        $ vagrant ssh
-        vagrant@precise32:~$ cd /steelscript/steepscript_appfwk/config/reports
-
-Changes and edits can now easily be made in the staging area without the need for
-sudo'ing or worrying about permissions.
-
-A summary of included aliases and commands:
-
-========================= ==========================================================================
-Aliases / Functions       Description
-========================= ==========================================================================
-``view_err_log``          show the apache error log
-``view_access_log``       show the apache access log
-``view_portal_log``       show the portal debug log
-``cdproject``             shortcut to `cd /home/vagrant/steelscript_appfwk`, the staging directory
-``cdwww``                 shortcut to `cd /steelscript/www`, the deployed directory
-``cdshared``              shortcut to `cd /vagrant`, the shared directory with the host machine.
-                          This can be a convenient way to share files between the guest and host.
-``run_ipython_notebooks`` shortcut to run ipython notebook server (documented below)
-``appfwk_dev_server``     shortcut to run the django development server in the staging directory
-``appfwk_collect_logs``   collects and zips up all the appropriate logs to help with
-                          debugging VM or Portal issues.
-========================= ==========================================================================
-
-For further information, see the following descriptions about Portal and how to
-customize it:
-
-    `Introducing the FlyScript Portal <https://splash.riverbed.com/docs/DOC-1765>`_
-    `SteelScript App Framework on GitHub <https://github.com/riverbed/steelscript-app-fmwk>`_
-
-
-IPython Notebooks
------------------
-
-1. Once installed, login to the machine, and start a fresh IPython notebook instance:
-
-.. code-block:: console
-
-        $ vagrant ssh
-        vagrant@precise32:~$ run_ipython_notebook
-        [NotebookApp] Created profile dir: u'/home/vagrant/.ipython/profile_default'
-        [NotebookApp] Serving notebooks from /home/vagrant
-        [NotebookApp] The IPython Notebook is running at: http://<ipaddress>:8888/
-        [NotebookApp] Use Control-C to stop this server and shut down all kernels.
-        [NotebookApp] No web browser found: could not locate runnable browser.
-
-2. On a browser on the host machine, head to the following url:
-   `http://127.0.0.1:38888 <http://127.0.0.1:38888>`_.
-3. A notebook instance should be visible.
-4. Any notebooks created, will be saved to the directory where the command was
-   started from.  In the example above, this would be the home directory for
-   the user ``vagrant`` (the default user for new virtual machines).
-5. For a more in depth introduction to IPython notebooks, there are several
-   examples included in the documentation:
-
-.. code-block:: console
-
-        vagrant@precise32:~$ cd /usr/local/share/doc/ipython/examples/notebooks
-        vagrant@precise32:/usr/local/share/doc/ipython/examples/notebooks$ ipython notebook --ip=`facter ipaddress` --pylab=inline
-        [NotebookApp] Using existing profile dir: u'/home/vagrant/.ipython/profile_default'
-        [NotebookApp] Serving notebooks from /usr/local/share/doc/ipython/examples/notebooks
-        [NotebookApp] The IPython Notebook is running at: http://10.0.2.15:8888/
-        [NotebookApp] Use Control-C to stop this server and shut down all kernels.
-        [NotebookApp] No web browser found: could not locate runnable browser.
-
-6. Now opening the same URL as in step 2 will show several pre-generated
-   example scripts you can walk through. You won't be able to save changes
-   here, but that should make experimentation a little easier too.
-
-Note: this notebook will be accessible to anyone on your LAN, if additional
-security is required, learn more about adding passwords and encryption
-`here in the documentation <http://ipython.org/ipython-doc/dev/interactive/htmlnotebook.html#security>`_.
+`See the usage document <https://support.riverbed.com/apis/steelscript/vmconfig/usage.html>`_
+for a description of the layout and configuration of the SteelScript VM along with important
+security considerations should you deploy this VM within your network.
 

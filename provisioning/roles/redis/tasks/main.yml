@@ -1,0 +1,35 @@
+---
+# configure redis for any server type
+#
+# download and install redis stable
+#
+
+- name: ensure directory
+  file: path=/home/vagrant/src
+      state=directory mode=775
+      owner={{ project_owner_devel }} group={{ project_group_devel }}
+
+- name: download
+  get_url: url=http://download.redis.io/redis-stable.tar.gz
+      dest=/home/vagrant/src/redis-stable.tar.gz
+  sudo_user: vagrant
+
+- name: unpack
+  unarchive: copy=no
+      src=/home/vagrant/src/redis-stable.tar.gz
+      dest=/home/vagrant/src/
+      creates=/home/vagrant/src/redis-stable/README
+  sudo_user: vagrant
+
+- name: build
+  shell: >
+    make
+    chdir=/home/vagrant/src/redis-stable
+    creates=/home/vagrant/src/redis-stable/src/redis-server
+  sudo_user: vagrant
+
+- name: install
+  shell: >
+    make install
+    chdir=/home/vagrant/src/redis-stable
+    creates=/usr/local/bin/redis-server

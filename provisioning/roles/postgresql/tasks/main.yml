@@ -1,0 +1,72 @@
+---
+# configure postgresql for any server type
+#
+# setup postgresql database
+#
+
+- name: install postgresql dependency
+  pip: name={{item}} virtualenv={{ virtualenv_devel }}
+  with_items:
+      - psycopg2
+  sudo_user: vagrant
+
+- name: postgresql - initialize database
+  command: service postgresql initdb
+           creates=/var/lib/pgsql/data/postgresql.conf
+
+- name: start and enable postgresql service
+  service: name=postgresql state=started enabled=yes
+
+#- name: postgresql - ensure db is listening on all localhost
+#  lineinfile: dest=/var/lib/pgsql/data/postgresql.conf
+#    regexp='^#?listen_addresses\s*='
+#    line="listen_addresses = '127.0.0.1'"
+#    state=present
+#  notify: restart postgresql
+
+- name: postgresql - enable trusted local logins
+  lineinfile: dest=/var/lib/pgsql/data/pg_hba.conf
+              regexp='local\s+all\s+all\s+peer'
+              line='local all all trust'
+  notify: restart postgresql
+
+- name: restart postgresql
+  service: name=postgresql state=restarted
+
+#
+# Apache database and user
+#
+- name: postgresql - add App Framework django user
+  postgresql_user: name={{ apache_django_user }}
+                   password={{ apache_django_password }}
+                   role_attr_flags=CREATEDB
+
+- name: postgresql - add App Framework Database
+  postgresql_db: name={{ apache_django_db }}
+                 state=present
+                 owner={{ apache_django_user }}
+
+- name: postgresql - assign user permissions to database
+  postgresql_user: name={{ apache_django_user }}
+                   priv=ALL
+                   role_attr_flags=CREATEDB
+                   db={{ apache_django_db }}
+
+#
+# Development database and user
+#
+- name: postgresql - add App Framework django user
+  postgresql_user: name={{ dev_django_user }}
+                   password={{ dev_django_password }}
+                   role_attr_flags=CREATEDB
+
+- name: postgresql - add App Framework Database
+  postgresql_db: name={{ dev_django_db }}
+                 state=present
+                 owner={{ dev_django_user }}
+
+- name: postgresql - assign user permissions to database
+  postgresql_user: name={{ dev_django_user }}
+                   priv=ALL
+                   role_attr_flags=CREATEDB
+                   db={{ dev_django_db }}

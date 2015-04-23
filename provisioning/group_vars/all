@@ -17,14 +17,21 @@ project_owner_apache: apache
 project_group_apache: apache
 virtualenv_apache: "{{ project_home_apache }}/virtualenv"
 
-service_name: httpd
+db_root_password: vagrantRoot!
 
-mysql_root_password: vagrantRoot!
-mysql_django_db: django_appfwk_db
-mysql_django_user: django_appfwk
-mysql_django_password: djangoSteelScript!
+# apache db config
+apache_django_db: django_apache_db
+apache_django_user: django_apache
+apache_django_password: djangoSteelScript!
+
+# development db config
+dev_django_db: django_devel_db
+dev_django_user: django_dev
+dev_django_password: djangoSteelScriptDev!
+
 
 steelscript_packages:
+    - reschema
     - steelscript
     - steelscript.appfwk
     - steelscript.appfwk.business-hours
@@ -35,6 +42,7 @@ steelscript_packages:
     - steelscript.steelhead
 
 steelscript_repos:
+    - reschema
     - steelscript
     - steelscript-appfwk
     - steelscript-appfwk-business-hours
@@ -43,6 +51,17 @@ steelscript_repos:
     - steelscript-wireshark
     - steelscript-cmdline
     - steelscript-steelhead
+
+steelscript_items:
+    - {pkg: 'reschema', repo: 'reschema'}
+    - {pkg: 'steelscript', repo: 'steelscript' }
+    - {pkg: 'steelscript.appfwk', repo: 'steelscript-appfwk' }
+    - {pkg: 'steelscript.appfwk.business-hours', repo: 'steelscript-appfwk-business-hours' }
+    - {pkg: 'steelscript.netprofiler', repo: 'steelscript-netprofiler' }
+    - {pkg: 'steelscript.netshark', repo: 'steelscript-netshark' }
+    - {pkg: 'steelscript.wireshark', repo: 'steelscript-wireshark' }
+    - {pkg: 'steelscript.cmdline', repo: 'steelscript-cmdline' }
+    - {pkg: 'steelscript.steelhead', repo: 'steelscript-steelhead' }
 
 system_packages_debian:
     # core packages
@@ -85,21 +104,29 @@ system_packages_debian:
 
 system_packages_redhat:
     # core packages
+    - ntpd
+    - zsh
     - git
     #- tig - unavailable from yum
+    - tree
     - vim-enhanced
-    - emacs
-    - libselinux-python
+    #- emacs
+    #- libselinux-python
     #- python-keyczar
     # dev packages
     - gcc-c++
-    - zlib-devel
-    - openssl-devel
     - python-devel
     - sqlite-devel
-    - bzip2-devel
-    - openldap-devel
-    - libxslt-devel
+    - zlib-devel
+
+    # dev libraries for other packages
+    #- openssl-devel
+    #- bzip2-devel
+    #- openldap-devel
+    #- libxslt-devel
+    - libpng-devel
+    - freetype-devel
+    - graphviz
 
     # networking packages
     - net-snmp
@@ -110,16 +137,12 @@ system_packages_redhat:
     # python packages
     - python
     - python-setuptools
-    - python-matplotlib
-    - python-imaging
-    - python-ldap
-    - numpy
-    - python-nose
 
     # web server packages
-    - mysql
-    - mysql-server
-    - mysql-devel
+    - postgresql
+    - postgresql-server
+    - postgresql-devel
+    - postgresql-contrib
     - httpd
     - mod_ssl
     - mod_wsgi
@@ -128,9 +151,10 @@ system_packages: "{{ system_packages_redhat }}"
 
 python_packages:
     - pip
-      #- ipython
     - pysnmp
-    - MySQL-python
+    - psycopg2
     - supervisor
+    - virtualenv
+    - ansible
 
 

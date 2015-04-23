@@ -1,0 +1,57 @@
+---
+#
+# setup development virtualenv and steelscript packages
+#
+- name: create virtualenv
+  shell: virtualenv {{ virtualenv_devel }}
+      creates={{ virtualenv_devel }}/bin/activate
+  sudo_user: vagrant
+
+- name: create source directory
+  file: path={{ project_home_devel }}/src
+      state=directory mode=775
+      owner={{ project_owner_devel }} group={{ project_group_devel }}
+
+- name: install steelscript packages and dependencies
+  pip: name='file:///vagrant/dev/{{ item.repo }}'
+      extra_args='-e'
+      virtualenv={{ virtualenv_devel }}
+      chdir=/vagrant/dev
+      #creates=/home/vagrant/virtualenv/lib/python2.7/site-packages/{{ item.pkg }}.egg-link
+  with_items: steelscript_items
+  sudo_user: vagrant
+
+#
+# create development appfwk project
+#
+- name: create app framework project directory
+  shell: >
+      . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_devel }}
+      chdir={{ project_home_devel }}
+      creates={{ project_root_devel }}
+  sudo_user: vagrant
+
+- name: copy local project settings
+  template: src=local_settings.j2
+      dest={{ project_root_devel }}/local_settings.py
+      mode=664
+      owner={{ project_owner_devel }} group={{ project_group_devel }}
+
+- name: reset framework with new settings
+  shell: >
+      {{ virtualenv_devel }}/bin/python manage.py reset_appfwk --drop-users --force && touch .initialized
+      chdir={{ project_root_devel }}
+      creates={{ project_root_devel }}/.initialized
+  sudo_user: vagrant
+
+#
+# include python extras
+#
+- name: install ipython notebook and flower into virtualenv
+  pip: name={{ item }}
+      virtualenv={{ virtualenv_devel }}
+  with_items:
+      - ipython[all]
+      - matplotlib
+      - flower
+  sudo_user: vagrant

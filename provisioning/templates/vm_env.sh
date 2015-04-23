@@ -1,4 +1,11 @@
 #!/usr/bin/sh
+
+# basic environment config
+export TERM=xterm-256color
+# disable default which overwrites terminal title
+export PROMPT_COMMAND=
+alias ls='ls --color'
+
 export PROJECT_DEV_DIR={{ project_root_devel }}
 export PROJECT_DEV_VENV={{ virtualenv_devel }}
 
@@ -20,14 +27,23 @@ alias cdproject='cd $PROJECT_DEV_DIR'
 alias cdwww='cd $PROJECT_APACHE_DIR'
 alias cdshared='cd /vagrant'
 
+# Development aliases
+export SRC_DIR=/vagrant/dev
+export PROGRESSD_DIR=$SRC_DIR/steelscript-appfwk/steelscript/appfwk/progressd
+
+alias start_redis='cd /home/vagrant && redis-server'
+alias start_progressd='cd $PROGRESSD_DIR && python progressd.py $PROJECT_DEV_DIR'
+alias start_celery='cd $PROJECT_DEV_DIR && rm -f logs/celery.txt && python manage.py celery worker -l DEBUG -f logs/celery.txt -c4 -n worker1.%h'
+alias start_flower='cd $PROJECT_DEV_DIR && python manage.py celery flower --port=8888'
+alias start_appfwk='cd $PROJECT_DEV_DIR && python manage.py runserver 0.0.0.0:8000'
+
+
+
 alias appfwk_dev_server='cdproject && $PROJECT_DEV_VENV/bin/python $PROJECT_DEV_DIR/manage.py runserver `facter ipaddress`:8000'
 alias run_ipython_notebook='mkdir -p ~/ipython_notebooks && cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --no-browser'
 
 alias virtualenv_dev='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 alias virtualenv_www='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
-
-# setup terminal options
-export TERM=xterm-256color
 
 
 # Activate virtual environment by default on login

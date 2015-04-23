@@ -1,0 +1,115 @@
+from steelscript.appfwk.project.settings import *
+
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+DATAHOME = os.getenv('DATAHOME', PROJECT_ROOT)
+DATA_CACHE = os.path.join(DATAHOME, 'data', 'datacache')
+INITIAL_DATA = os.path.join(DATAHOME, 'data', 'initial_data')
+REPORTS_DIR = os.path.join(PROJECT_ROOT, 'reports')
+
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+MEDIA_ROOT = DATA_CACHE
+
+# Optionally add additional applications specific to this project instance
+
+LOCAL_APPS = (
+    # additional apps can be listed here
+    'djcelery',
+)
+INSTALLED_APPS += LOCAL_APPS
+
+### CELERY
+
+# redis for broker and backend
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+import djcelery
+djcelery.setup_loader()
+
+#CELERY_ALWAYS_EAGER = True
+TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'
+
+### END CELERY
+
+# Configure database for development or production.
+
+DATABASES = {
+    'default': {
+        # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        # Path to database file if using sqlite3.
+        # Database name for others
+        'NAME': '{{ dev_django_db }}',
+
+        # USER, PASSWORD, HOST and PORT are not used by sqlite3.
+        'USER': '{{ dev_django_user }}',
+        'PASSWORD': '{{ dev_django_password }}',
+        'HOST': '',  # Set to empty string for localhost.
+        'PORT': '',  # Set to empty string for default.
+    }
+}
+
+# Setup loggers to local directory
+LOGGING['handlers']['logfile']['filename'] = os.path.join(DATAHOME, 'logs',
+                                                          'log.txt')
+LOGGING['handlers']['backend-log']['filename'] = os.path.join(DATAHOME, 'logs',
+                                                              'log-db.txt')
+
+# Optionally add additional global error handlers
+
+LOCAL_ERROR_HANDLERS = (
+    # additional global error handlers can be listed here
+)
+GLOBAL_ERROR_HANDLERS += LOCAL_ERROR_HANDLERS
+
+# To enable syslog handling instead of local logging, see the next blocks of
+# LOGGING statements.  Note the different section for Linux/Mac vs Windows.
+
+# remove these loggers since the configuration will attempt to write the
+# files even if they don't have a logger declared for them
+#LOGGING['disable_existing_loggers'] = True
+#LOGGING['handlers'].pop('logfile')
+#LOGGING['handlers'].pop('backend-log')
+#
+# Use the following handler for Linux/BSD/Mac machines
+#LOGGING['handlers']['syslog'] = {
+#    'level': 'DEBUG',
+#    'class': 'logging.handlers.SysLogHandler',
+#    'formatter': 'standard_syslog',
+#    'facility': SysLogHandler.LOG_USER,
+#    'address': '/var/run/syslog' if sys.platform == 'darwin' else '/dev/log'
+#}
+#
+# Use the following handler for sending to Windows Event logs,
+# you will need an additional package for Windows: Python for Windows
+# Extensions, which can be found here:
+#    http://sourceforge.net/projects/pywin32/files/pywin32/
+#LOGGING['handlers']['syslog'] = {
+#    'level': 'DEBUG',
+#    'class': 'logging.handlers.NTEventLogHandler',
+#    'formatter': 'standard_syslog',
+#    'appname': 'steelscript',
+#}
+#
+#LOGGING['loggers'] = {
+#    'django.db.backends': {
+#        'handlers': ['null'],
+#        'level': 'DEBUG',
+#        'propagate': False,
+#    },
+#    '': {
+#        'handlers': ['syslog'],
+#        'level': 'INFO',
+#        'propagate': True,
+#    },
+#}
+
+SECRET_KEY = '-g(_%y(zig&)c535me870lh##o@#44e^95==iq2ur83h7lj@vv'
+
+# Add other settings customizations below, which will be local to this
+# machine only, and not recorded by git. This could include database or
+# other authentications, LDAP settings, or any other overrides.
+
+# For example LDAP configurations, see the file
+# `project/ldap_example.py`.

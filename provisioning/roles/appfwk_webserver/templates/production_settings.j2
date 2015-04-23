@@ -14,7 +14,6 @@ MEDIA_ROOT = DATA_CACHE
 
 LOCAL_APPS = (
     # additional apps can be listed here
-    'steelscript.netshark.appfwk',
 )
 INSTALLED_APPS += LOCAL_APPS
 
@@ -23,9 +22,9 @@ INSTALLED_APPS += LOCAL_APPS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '{{ mysql_django_db }}',
-        'USER': '{{ mysql_django_user}}',
-        'PASSWORD': '{{ mysql_django_password }}',
+        'NAME': '{{ apache_django_db }}',
+        'USER': '{{ apache_django_user}}',
+        'PASSWORD': '{{ apache_django_password }}',
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }

@@ -1,0 +1,90 @@
+---
+# Create scheduler directory - owned by root
+- name: create scheduler directory
+  file: path={{ project_home_apache }}/scheduler
+      state=directory mode=775
+
+- name: copy scheduler.cfg
+  template: src=templates/scheduler/scheduler.cfg
+      dest={{ project_home_apache }}/scheduler/scheduler.cfg
+      mode=600
+
+- name: copy supervisord.conf
+  template: src=templates/scheduler/supervisord.conf
+      dest={{ project_home_apache }}/scheduler/supervisord.conf
+      mode=600
+
+- name: copy auth.txt
+  template: src=templates/scheduler/auth.txt
+      dest={{ project_home_apache }}/scheduler/auth.txt
+      mode=600
+
+- name: copy scheduler boot toogle script
+  template: src=templates/scheduler/toggle_scheduler.py
+      dest=/usr/local/bin/toggle_scheduler
+      mode=755
+
+#
+# setup appfwk apache project
+#
+- name: apache - steelscript directory
+  file: path={{ project_home_apache }}
+      state=directory mode=775
+      owner={{ project_owner_apache }} group={{ project_group_apache }}
+
+- name: apache - create app framework project directory
+  shell: >
+      . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_apache }} --offline-js
+      chdir={{ project_home_apache }}
+      creates={{ project_root_apache }}
+  sudo_user: "{{ project_owner_apache }}"
+  environment:
+      HOME: "{{ project_home_apache }}"
+
+- name: apache - steelscript home directory
+  file: path={{ project_wsgi }}/.steelscript
+      state=directory mode=775
+      owner={{ project_owner_apache }} group={{ project_group_apache }}
+
+- name: apache - install appfwk wsgi configuration
+  template: src=templates/steelscript_appfwk.wsgi
+      dest={{ project_wsgi }}/steelscript_appfwk.wsgi
+      mode=664
+      owner={{ project_owner_apache }} group={{ project_group_apache }}
+
+- name: copy production settings
+  template: src=production_settings.j2
+      dest={{ project_root_apache }}/local_settings.py
+      mode=664
+      owner={{ project_owner_apache }} group={{ project_group_apache }}
+  notify:
+  - restart apache
+
+- name: apache - reset and initialize default app framework
+  shell: >
+      . {{ virtualenv_devel }}/bin/activate && python manage.py reset_appfwk --force --drop-users --trace && touch .initialized
+      chdir={{ project_root_apache }}
+      creates={{ project_root_apache }}/.initialized
+  sudo_user: "{{ project_owner_apache }}"
+  environment:
+      HOME: "{{ project_home_apache }}"
+  notify:
+  - restart apache
+
+- name: apache - collect static files
+  shell: >
+      . {{ virtualenv_devel }}/bin/activate && python manage.py collectstatic --noinput
+      chdir={{ project_root_apache }}
+      creates={{ project_root_apache }}/static
+  sudo_user: "{{ project_owner_apache }}"
+  environment:
+      HOME: "{{ project_home_apache }}"
+  notify:
+  - restart apache
+
+- name: ensure correct appfwk ownership
+  file: path={{ project_root_apache }}
+      state=directory
+      owner={{ project_owner_apache }} group={{ project_group_apache }}
+      recurse=yes
+

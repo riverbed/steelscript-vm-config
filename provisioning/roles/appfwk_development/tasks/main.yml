@@ -22,6 +22,18 @@
   sudo_user: vagrant
 
 #
+# include python extras
+#
+- name: install ipython notebook and flower into virtualenv
+  pip: name={{ item }}
+      virtualenv={{ virtualenv_devel }}
+  with_items:
+      - ipython[all]
+      - matplotlib
+      - flower
+  sudo_user: vagrant
+
+#
 # create development appfwk project
 #
 - name: create app framework project directory
@@ -44,14 +56,3 @@
       creates={{ project_root_devel }}/.initialized
   sudo_user: vagrant
 
-#
-# include python extras
-#
-- name: install ipython notebook and flower into virtualenv
-  pip: name={{ item }}
-      virtualenv={{ virtualenv_devel }}
-  with_items:
-      - ipython[all]
-      - matplotlib
-      - flower
-  sudo_user: vagrant

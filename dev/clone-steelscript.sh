@@ -13,7 +13,6 @@ steelscript-cmdline
 steelscript-netprofiler
 steelscript-netshark
 steelscript-steelhead
-steelscript-vm-config
 steelscript-wireshark"
 
 for REPO in $REPOS

@@ -13,21 +13,21 @@ MEDIA_ROOT = DATA_CACHE
 
 LOCAL_APPS = (
     # additional apps can be listed here
-    'djcelery',
+#    'djcelery',
 )
 INSTALLED_APPS += LOCAL_APPS
 
 ### CELERY
 
-# redis for broker and backend
-BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
-import djcelery
-djcelery.setup_loader()
-
-#CELERY_ALWAYS_EAGER = True
-TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'
+## redis for broker and backend
+#BROKER_URL = 'redis://localhost:6379/0'
+#CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+#
+#import djcelery
+#djcelery.setup_loader()
+#
+##CELERY_ALWAYS_EAGER = True
+#TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'
 
 ### END CELERY
 

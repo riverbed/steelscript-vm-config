@@ -13,11 +13,10 @@
       owner={{ project_owner_devel }} group={{ project_group_devel }}
 
 - name: install steelscript packages and dependencies
-  pip: name='file:///vagrant/dev/{{ item.repo }}'
+  pip: name='file:///src/{{ item.repo }}'
       extra_args='-e'
       virtualenv={{ virtualenv_devel }}
-      chdir=/vagrant/dev
-      #creates=/home/vagrant/virtualenv/lib/python2.7/site-packages/{{ item.pkg }}.egg-link
+      chdir=/src
   with_items: steelscript_items
   sudo_user: vagrant
 

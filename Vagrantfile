@@ -6,9 +6,8 @@
 
 system("
     if [ #{ARGV[0]} == 'provision' ]; then
-        echo 'Cloning steelscript repositories to dev folder ...'
         cd dev
-        ./clone-steelscript.sh
+        ./link-steelscript.py
     fi
 ")
 
@@ -35,6 +34,10 @@ Vagrant.configure("2") do |config|
       v.vmx["numvcpus"] = "2"
       v.vmx["memsize"] = "1024"
   end
+
+  # shared folder to synced sources directory
+  # link created by link-steelscript.py script
+  config.vm.synced_folder "sources/", "/src"
 
   # avoid root mesg issues from https://github.com/mitchellh/vagrant/issues/1673
   #config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"

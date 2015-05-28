@@ -4,8 +4,9 @@
 # accompanying the software ("License").  This software is distributed "AS IS"
 # as set forth in the License.
 
+# Configure 'sources' symlink, will abort if link already exists
 system("
-    if [ #{ARGV[0]} == 'provision' ]; then
+    if [ #{ARGV[0]} == 'up' ] || [ #{ARGV[0]} == 'provision' ]; then
         cd dev
         ./link-steelscript.py
     fi

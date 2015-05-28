@@ -21,15 +21,16 @@
   sudo_user: vagrant
 
 #
-# include python extras
+# include development extras
 #
-- name: install ipython notebook and flower into virtualenv
+- name: install ipython notebook, flower and graphviz into virtualenv
   pip: name={{ item }}
       virtualenv={{ virtualenv_devel }}
   with_items:
       - ipython[all]
       - matplotlib
       - flower
+      - graphviz
   sudo_user: vagrant
 
 #

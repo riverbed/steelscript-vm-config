@@ -17,6 +17,10 @@ project_owner_apache: apache
 project_group_apache: apache
 virtualenv_apache: "{{ project_home_apache }}/virtualenv"
 
+# location of steelscript source repos inside VM
+# should align with shared directory from Vagrantfile
+steelscript_sources: /src
+
 db_root_password: vagrantRoot!
 
 # apache db config

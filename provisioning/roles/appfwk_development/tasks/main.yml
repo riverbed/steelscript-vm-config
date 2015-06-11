@@ -7,13 +7,13 @@
       creates={{ virtualenv_devel }}/bin/activate
   sudo_user: vagrant
 
-- name: create source directory
+- name: create source directory for redis and other 3rd party code
   file: path={{ project_home_devel }}/src
       state=directory mode=775
       owner={{ project_owner_devel }} group={{ project_group_devel }}
 
 - name: install steelscript packages and dependencies
-  pip: name='file:///src/{{ item.repo }}'
+  pip: name='file:///{{ steelscript_sources }}/{{ item.repo }}'
       extra_args='-e'
       virtualenv={{ virtualenv_devel }}
       chdir=/src

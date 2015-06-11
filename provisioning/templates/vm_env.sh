@@ -26,9 +26,10 @@ alias view_project_log='less $DEV_LOGDIR/log.txt'
 alias cdproject='cd $PROJECT_DEV_DIR'
 alias cdwww='cd $PROJECT_APACHE_DIR'
 alias cdshared='cd /vagrant'
+alias cdsitepackages='cd /home/vagrant/virtualenv/lib/python2.7/site-packages'
 
 # Development aliases
-export SRC_DIR=/vagrant/dev
+export SRC_DIR={{ steelscript_sources }}
 export PROGRESSD_DIR=$SRC_DIR/steelscript-appfwk/steelscript/appfwk/progressd
 
 alias start_redis='cd /home/vagrant && redis-server'

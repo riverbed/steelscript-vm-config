@@ -11,8 +11,8 @@
       - postgresql
       - redis
       - appfwk_development
+      - appfwk_webserver
       - httpd
-      #- appfwk_webserver
 
       # debian/ubuntu os
       #- base_debian

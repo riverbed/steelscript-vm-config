@@ -10,18 +10,35 @@ REPORTS_DIR = os.path.join(PROJECT_ROOT, 'reports')
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 MEDIA_ROOT = DATA_CACHE
 
+# Task model specific configs
+APPFWK_TASK_MODEL = 'async'
+#APPFWK_TASK_MODEL = 'celery'
+
+if APPFWK_TASK_MODEL == 'celery':
+    LOCAL_APPS = (
+        'djcelery',
+    )
+    INSTALLED_APPS += LOCAL_APPS
+
+    # redis for broker and backend
+    BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+    import djcelery
+    djcelery.setup_loader()
+
+    #CELERY_ALWAYS_EAGER = True
+    TEST_RUNNER = 'djcelery.contrib.test_runner.CeleryTestSuiteRunner'
+
 # Optionally add additional applications specific to this project instance
 
-LOCAL_APPS = (
-    # additional apps can be listed here
+INSTALLED_APPS += (
 )
-INSTALLED_APPS += LOCAL_APPS
 
 # Configure database for development or production.
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': '{{ apache_django_db }}',
         'USER': '{{ apache_django_user}}',
         'PASSWORD': '{{ apache_django_password }}',
@@ -31,11 +48,20 @@ DATABASES = {
 }
 
 # Setup loggers to local directory
-LOGGING['handlers']['logfile']['filename'] = os.path.join(DATAHOME, 'logs', 'log.txt')
-LOGGING['handlers']['backend-log']['filename'] = os.path.join(DATAHOME, 'logs', 'log-db.txt')
+LOGGING['handlers']['logfile']['filename'] = os.path.join(DATAHOME, 'logs',
+                                                          'log.txt')
+LOGGING['handlers']['backend-log']['filename'] = os.path.join(DATAHOME, 'logs',
+                                                              'log-db.txt')
 
-# To enable syslog handling instead of local logging, uncomment next block of LOGGING
-# statements
+# Optionally add additional global error handlers
+
+LOCAL_ERROR_HANDLERS = (
+    # additional global error handlers can be listed here
+)
+GLOBAL_ERROR_HANDLERS += LOCAL_ERROR_HANDLERS
+
+# To enable syslog handling instead of local logging, see the next blocks of
+# LOGGING statements.  Note the different section for Linux/Mac vs Windows.
 
 # remove these loggers since the configuration will attempt to write the
 # files even if they don't have a logger declared for them
@@ -43,12 +69,24 @@ LOGGING['handlers']['backend-log']['filename'] = os.path.join(DATAHOME, 'logs', 
 #LOGGING['handlers'].pop('logfile')
 #LOGGING['handlers'].pop('backend-log')
 #
+# Use the following handler for Linux/BSD/Mac machines
 #LOGGING['handlers']['syslog'] = {
 #    'level': 'DEBUG',
 #    'class': 'logging.handlers.SysLogHandler',
 #    'formatter': 'standard_syslog',
 #    'facility': SysLogHandler.LOG_USER,
 #    'address': '/var/run/syslog' if sys.platform == 'darwin' else '/dev/log'
+#}
+#
+# Use the following handler for sending to Windows Event logs,
+# you will need an additional package for Windows: Python for Windows
+# Extensions, which can be found here:
+#    http://sourceforge.net/projects/pywin32/files/pywin32/
+#LOGGING['handlers']['syslog'] = {
+#    'level': 'DEBUG',
+#    'class': 'logging.handlers.NTEventLogHandler',
+#    'formatter': 'standard_syslog',
+#    'appname': 'steelscript',
 #}
 #
 #LOGGING['loggers'] = {

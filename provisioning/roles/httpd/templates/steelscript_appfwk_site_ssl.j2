@@ -10,6 +10,17 @@ WSGIPythonHome {{ virtualenv_devel }}
 #<VirtualHost *:80>
 #    WSGIPassAuthorization On
 #    Alias /static {{ project_root_apache }}/static
+#
+#    <Directory {{ project_root_apache }}/static>
+#        Require all granted
+#    </Directory>
+#
+#    <Directory {{ project_root_apache }}
+#        <Files steelscript_appfwk.wsgi>
+#            Require all granted
+#        </Files>
+#    </Directory>
+#
 #    WSGIScriptAlias / {{ project_wsgi }}/steelscript_appfwk.wsgi
 #    WSGIDaemonProcess {{ project_name }} processes=2
 #    WSGIProcessGroup {{ project_name }}
@@ -25,19 +36,30 @@ WSGIPythonHome {{ virtualenv_devel }}
 #       https://wiki.debian.org/Self-Signed_Certificate
 
 
-NameVirtualHost *:443
-
 # Redirect all http -> https
 RewriteEngine on
 RewriteCond %{HTTPS} off
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
 
-<VirtualHost _default_:443>
+<VirtualHost *:443>
         SSLEngine on
-        SSLCertificateFile /etc/pki/tls/certs/ca.crt
-        SSLCertificateKeyFile /etc/pki/tls/private/ca.key
+        SSLCertificateFile /etc/pki/tls/certs/localhost.crt
+        SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
+        WSGIPassAuthorization On
         Alias /static {{ project_root_apache }}/static
+
+        <Directory {{ project_root_apache }}/static>
+            Require all granted
+        </Directory>
+
+        <Directory {{ project_root_apache }}>
+            <Files steelscript_appfwk.wsgi>
+                Require all granted
+            </Files>
+        </Directory>
+
         WSGIScriptAlias / {{ project_wsgi }}/steelscript_appfwk.wsgi
         WSGIDaemonProcess {{ project_name }} processes=2
         WSGIProcessGroup {{ project_name }}
 </VirtualHost>
+

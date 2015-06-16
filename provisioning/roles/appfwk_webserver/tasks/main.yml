@@ -27,6 +27,10 @@
 #
 # setup appfwk apache project
 #
+- name: update vagrant home permissions
+  file: path={{ project_home_devel }}
+      state=directory mode=755
+
 - name: apache - steelscript directory
   file: path={{ project_home_apache }}
       state=directory mode=775
@@ -47,7 +51,7 @@
       owner={{ project_owner_apache }} group={{ project_group_apache }}
 
 - name: apache - install appfwk wsgi configuration
-  template: src=templates/steelscript_appfwk.wsgi
+  template: src=steelscript_appfwk.wsgi
       dest={{ project_wsgi }}/steelscript_appfwk.wsgi
       mode=664
       owner={{ project_owner_apache }} group={{ project_group_apache }}

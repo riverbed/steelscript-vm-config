@@ -1,31 +1,27 @@
 ---
-# configure apache2 for debian/ubuntu server types
+# configure apache (httpd) for Red Hat server types
 
 #
 # setup apache certificates and SSL
 #
+# http://wiki.centos.org/HowTos/Https
+#
+# CentOS seems to include a default localhost cert which
+# is probably sufficient since this would be insecure anyways
 
-#- name: SSL ... make local cert directory
-#  file: path=/etc/ssl/localcerts
-#      state=directory mode=775
-#      owner={{ project_owner_apache }} group={{ project_group_apache }}
-#
-#- name: SSL ... install local signed cert pem
-#  template: src=templates/ssl_apache/selfsignedcerts/apache_local.pem
-#      dest=/etc/ssl/localcerts/apache_local.pem
-#      mode=600
-#      owner=root group=root
-#  notify:
-#  - restart apache
-#
-#- name: SSL ... install local signed cert key
+#- name: SSL ... create and install self-signed cert
 #  template: src=templates/ssl_apache/selfsignedcerts/apache_local_nopass.key
 #      dest=/etc/ssl/localcerts/apache_local.key
 #      mode=600
 #      owner=root group=root
+#  command: >
+#      openssl req -new -nodes -x509 -subj "/C=US/ST=Massachusetts/L=Cambridge/O=IT/CN=${ansible_fqdn}" -days 3650 -keyout /etc/pki/private/apache.key -out /etc/pki/tls/certs/apache.crt -extensions v3_ca
+#      creates=/etc/pki/tls/certs/apache.crt
+#      mode=600
+#      owner=root group=root
 #  notify:
 #  - restart apache
-#
+
 #- name: SSL ... apache - update ports.conf
 #  template: src=templates/ssl_apache/ports.conf
 #      dest=/etc/apache2/ports.conf
@@ -34,18 +30,10 @@
 #  notify:
 #  - restart apache
 #
-#- name: SSL ... apache - steelscript appfwk site template
-#  template: src=templates/ssl_apache/steelscript_appfwk_site_ssl.j2
-#      dest=/etc/apache2/sites-available/steelscript_appfwk_site
-#      mode=664
-#      owner=root group=root
-#  notify:
-#  - restart apache
-#
 #
 #- name: apache - steelscript appfwk site template - SSL
-#  template: src=templates/steelscript_appfwk_site.j2
-#      dest=/etc/httpd/conf.d/steelscript_appfwk_site.conf
+#  template: src=steelscript_appfwk_site_ssl.j2
+#      dest=/etc/httpd/conf.d/steelscript_appfwk_site_ssl.conf
 #      mode=664
 #      owner=root group=root
 #  notify:
@@ -56,8 +44,8 @@
 #
 
 - name: apache - steelscript appfwk site template - non-SSL
-  template: src=templates/steelscript_appfwk_site_http.j2
-      dest=/etc/httpd/conf.d/steelscript_appfwk_site.conf
+  template: src=steelscript_appfwk_site_http.j2
+      dest=/etc/httpd/conf.d/steelscript_appfwk_site_http.conf
       mode=664
       owner=root group=root
   notify:

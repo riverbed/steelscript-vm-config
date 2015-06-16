@@ -114,6 +114,7 @@ system_packages_redhat:
     #- tig - unavailable from yum
     - tree
     - vim-enhanced
+    - unzip
     #- emacs
     #- libselinux-python
     #- python-keyczar
@@ -148,6 +149,7 @@ system_packages_redhat:
     - postgresql-devel
     - postgresql-contrib
     - httpd
+    - openssl
     - mod_ssl
     - mod_wsgi
 

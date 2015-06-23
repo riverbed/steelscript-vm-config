@@ -1,4 +1,0 @@
-# postgresql handlers
-
-- name: restart postgresql
-  service: name=postgresql state=restarted

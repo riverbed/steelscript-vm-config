@@ -32,7 +32,6 @@ alias cdsitepackages='cd /home/vagrant/virtualenv/lib/python2.7/site-packages'
 export SRC_DIR={{ steelscript_sources }}
 export PROGRESSD_DIR=$SRC_DIR/steelscript-appfwk/steelscript/appfwk/progressd
 
-alias start_redis='cd /home/vagrant && redis-server'
 alias start_progressd='cd $PROGRESSD_DIR && python progressd.py --path $PROJECT_DEV_DIR'
 alias start_celery='cd $PROJECT_DEV_DIR && rm -f logs/celery.txt && python manage.py celery worker -l DEBUG -f logs/celery.txt -c4 -n worker1.%h'
 alias start_flower='cd $PROJECT_DEV_DIR && python manage.py celery flower --port=8888'

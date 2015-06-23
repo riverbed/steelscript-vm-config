@@ -33,3 +33,32 @@
     make install
     chdir=/home/vagrant/src/redis-stable
     creates=/usr/local/bin/redis-server
+
+- name: init.d script
+  template: src=etc.init.d.redis.j2
+      dest=/etc/init.d/redis_6379
+      mode=755
+      owner=root group=root
+
+- name: etc directory
+  file: path=/etc/redis
+      state=directory mode=755
+      owner=root group=root
+
+- name: conf
+  template: src=etc.redis.conf.j2
+      dest=/etc/redis/6379.conf
+      mode=644
+      owner=root group=root
+
+- name: setup service runlevels
+  shell: >
+    chkconfig --add redis_6379
+
+- name: var directory
+  file: path=/var/redis/6379
+      state=directory mode=755
+      owner=root group=root
+
+- name: start and enable service
+  service: name=redis_6379 state=started enabled=yes

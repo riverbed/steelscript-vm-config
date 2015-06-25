@@ -140,3 +140,22 @@
 
 - name: start celeryd service
   shell: service celeryd start
+
+#
+# configure progressd to run as a service
+#
+
+- name: create /etc/init.d/progressd
+  template: src=etc.init.d.progressd.j2
+      dest=/etc/init.d/progressd
+      owner=root group=root mode=755
+
+- name: setup progressd service runlevels
+  shell: >
+    chkconfig --add progressd
+
+- name: enable progressd service levels
+  service: name=progressd enabled=yes
+
+- name: start progressd service
+  shell: service progressd start

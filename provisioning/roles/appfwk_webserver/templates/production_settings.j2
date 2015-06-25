@@ -10,6 +10,8 @@ REPORTS_DIR = os.path.join(PROJECT_ROOT, 'reports')
 STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
 MEDIA_ROOT = DATA_CACHE
 
+PROGRESSD_PORT = "{{ apache_progressd_port }}"
+
 # Task model specific configs
 APPFWK_TASK_MODEL = 'async'
 #APPFWK_TASK_MODEL = 'celery'

@@ -18,6 +18,7 @@ project_group_apache: apache
 # For now, the apache virtual env uses the same as the devel
 # virtualenv
 virtualenv_apache: "{{ project_home_devel }}/virtualenv"
+apache_progressd_port: 5001
 
 # location of steelscript source repos inside VM
 # should align with shared directory from Vagrantfile

@@ -92,3 +92,51 @@
       owner={{ project_owner_apache }} group={{ project_group_apache }}
       recurse=yes
 
+#
+# configure celery to run as a service
+#
+
+- name: create /var/run/celery directory
+  file: path=/var/run/celery
+      state=directory mode=755
+      owner=apache group=apache
+
+- name: create /var/log/celery directory
+  file: path=/var/log/celery
+      state=directory mode=755
+      owner=apache group=apache
+
+- name: create steelscript proj directory
+  file: path={{ project_root_apache }}/proj
+      state=directory mode=755
+      owner=apache group=apache
+
+- name: create steelscript proj/__init__.py
+  file: path={{ project_root_apache }}/proj/__init__.py
+      state=touch mode=644
+      owner=apache group=apache
+
+- name: create steelscript proj/celery.py
+  template: src=celery.py.j2
+      dest={{ project_root_apache }}/proj/celery.py
+      owner=apache group=apache mode=644
+
+- name: create /etc/default/celeryd
+  template: src=etc.default.celeryd.j2
+      dest=/etc/default/celeryd
+      owner=root group=root mode=644
+
+- name: create /etc/init.d/celeryd
+  template: src=etc.init.d.celeryd.j2
+      dest=/etc/init.d/celeryd
+      owner=root group=root mode=755
+
+- name: setup celeryd service runlevels
+  shell: >
+    chkconfig --add celeryd
+
+- name: enable celeryd service
+  service: name=celeryd enabled=yes
+
+- name: start celeryd service
+  shell: service celeryd start

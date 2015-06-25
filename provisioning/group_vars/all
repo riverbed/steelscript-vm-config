@@ -15,7 +15,9 @@ project_root_apache: "{{ project_home_apache }}/www"
 project_wsgi: "{{ project_root_apache }}"
 project_owner_apache: apache
 project_group_apache: apache
-virtualenv_apache: "{{ project_home_apache }}/virtualenv"
+# For now, the apache virtual env uses the same as the devel
+# virtualenv
+virtualenv_apache: "{{ project_home_devel }}/virtualenv"
 
 # location of steelscript source repos inside VM
 # should align with shared directory from Vagrantfile
@@ -162,5 +164,3 @@ python_packages:
     - supervisor
     - virtualenv
     - ansible
-
-

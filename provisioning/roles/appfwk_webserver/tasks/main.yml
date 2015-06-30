@@ -159,3 +159,19 @@
 
 - name: start progressd service
   shell: service progressd start
+
+#
+# update rsyslog configuration
+#
+
+- name: rsyslog appfwk settings
+  lineinfile: >
+    dest=/etc/rsyslog.conf regexp='{{ item.regexp }}' line='{{ item.line }}'
+    insertbefore='begin forwarding rule'
+  with_items:
+    - { regexp: 'SteelScript', line: '# SteelScript appframework' }
+    - { regexp: 'local1', line: 'local1.* /var/log/appfwk' }
+    - { regexp: 'local2', line: 'local2.* /var/log/appfwk-db' }
+
+- name: restart rsyslog
+  shell: service rsyslog restart

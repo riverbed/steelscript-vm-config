@@ -36,3 +36,6 @@ CELERYD_PID_FILE="/var/run/celery/%n.pid"
 # Workers should run as an unprivileged user.
 CELERYD_USER="{{ project_owner_apache }}"
 CELERYD_GROUP="{{ project_group_apache }}"
+
+# Default queue
+CELERY_DEFAULT_QUEUE="appfwk_prod"

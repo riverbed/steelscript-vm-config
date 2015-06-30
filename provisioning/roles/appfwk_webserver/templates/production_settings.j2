@@ -14,6 +14,7 @@ PROGRESSD_PORT = "{{ apache_progressd_port }}"
 
 # For production, turn off debugging as it causes memory issues
 DEBUG = False
+ALLOWED_HOSTS = ['127.0.0.1']
 
 # Logging
 
@@ -106,6 +107,7 @@ INSTALLED_APPS += (
 # redis for broker and backend
 BROKER_URL = 'redis://localhost:6379/1'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+CELERY_DEFAULT_QUEUE = 'appfwk_prod'
 
 import djcelery
 djcelery.setup_loader()

@@ -57,7 +57,7 @@
 
 - name: apache - create app framework project directory
   shell: >
-      . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_apache }} --offline-js
+      . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_apache }}
       chdir={{ project_home_apache }}
       creates={{ project_root_apache }}
   sudo_user: "{{ project_owner_apache }}"

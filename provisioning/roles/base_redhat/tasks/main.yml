@@ -36,8 +36,16 @@
     - 443/tcp
 
 #
-# Enable ntpd
+# Configure and enable ntpd
 #
+- name: configure ntpd
+  # add -x option
+  lineinfile: >
+      dest=/etc/sysconfig/ntpd
+      regexp='OPTIONS'
+      line='OPTIONS="-g -x"'
+      state=present
+
 - name: enable ntpd
   service: name=ntpd state=started enabled=yes
 

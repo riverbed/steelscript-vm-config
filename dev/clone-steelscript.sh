@@ -47,13 +47,55 @@ fi
 SCRIPT="reinstall.sh"
 if [ ! -e $SCRIPT ]; then
 cat > $SCRIPT << "EOF"
-#!/bin/zsh
+#!/bin/bash
 #
-# Args
+# Options
 # -u uninstall only
+# -e install editable (pip install -e .)
 # -d install deps too (default no-deps)
+#
 
+UNINSTALL=false
+EDITABLE=false
+INSTALL_DEPS=false
 
+while [[ $# > 0 ]]
+do
+    key="$1"
+
+    case $key in
+        -u|--uninstall)
+        UNINSTALL=true
+        ;;
+        -e|--editable)
+        EDITABLE=true
+        ;;
+        -d|--install-deps)
+        INSTALL_DEPS=true
+        ;;
+        *)
+        echo "SteelScript reinstall helper script"
+        echo "Options:"
+        echo " -u uninstall only"
+        echo " -e install editable (pip install -e .)"
+        echo " -d install deps too (default no-deps)"
+        exit
+        ;;
+    esac
+    shift # past argument or value
+done
+
+# setup pip command
+PIP_ARGS=""
+if [[ $INSTALL_DEPS == false ]]; then
+    PIP_ARGS=$PIP_ARGS"--no-deps "
+fi
+
+if [[ $EDITABLE == true ]]; then
+    PIP_ARGS=$PIP_ARGS"-e "
+fi
+
+# verify virtualenv
 if [ -z $VIRTUAL_ENV ]; then
     echo 'Activate a virtualenv first.'
     exit
@@ -61,21 +103,32 @@ else
     . $VIRTUAL_ENV/bin/activate
 fi
 
-for d in `ls | grep "^steelscript"`; do
-    echo "*********\n$d"
+# go to vagrant repo folder if not already in a suitable location
+DIRS=$(ls | grep "^steelscript")
+if [[ $DIRS == "" ]]; then
+    cd /src
+    DIRS=$(ls | grep "^steelscript")
+fi
+
+for d in $DIRS; do
+    echo "*********"
+    echo "$d"
     cd $d
+
+    # handle two different types of setup.py configs
     NAME=$(grep \'name\' setup.py | cut -d\' -f4)
+    if [[ $NAME == "" ]]; then
+        NAME=$(grep 'name=' setup.py | cut -d\' -f2)
+    fi
+
+    echo pip uninstall --yes $NAME
     pip uninstall --yes $NAME
-    rm -rf dist *egg-info
+    rm -rf *egg-info
 
     # any arg will disable install
-    if [[ $1 != "-u" ]]; then
-        if [[ $1 == "-d" ]]; then
-            pip install -e .
-        else
-            pip install --no-deps -e .
-
-        fi
+    if [[ $UNINSTALL == false ]]; then
+        echo pip install $PIP_ARGS .
+        pip install $PIP_ARGS .
     fi
 
     cd ..

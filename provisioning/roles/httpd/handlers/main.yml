@@ -5,3 +5,6 @@
 - name: restart apache
   service: name=httpd state=restarted
 
+
+- name: reload systemd
+  shell: systemctl daemon-reload

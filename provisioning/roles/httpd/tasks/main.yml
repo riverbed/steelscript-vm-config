@@ -67,3 +67,15 @@
 
 - name: start and enable apache service
   service: name=httpd state=started enabled=yes
+
+#
+# turn of PrivateTmp for apache
+#
+- name: apache disable PrivateTmp
+  lineinfile: >
+    dest=/etc/systemd/system/multi-user.target.wants/httpd.service
+    regexp='PrivateTmp'
+    line='PrivateTmp=false'
+  notify:
+  - restart apache
+  - reload systemd

@@ -76,17 +76,33 @@ rotate_logs() {
     echo "done."
 }
 
-appfwk_clean_perms() {
+appfwk_clean_pyc() {
+    cdwww
+    echo -n "Cleaning up old pyc files ... "
+    sudo find . -name "*.pyc" -exec rm {} \;
+    echo "done."
+}
+
+appfwk_restart_services() {
+    echo "Restarting App Framework services ... "
+    sudo service progressd restart
+    sudo service celeryd restart
+    sudo service apachectl restart
+}
+
+appfwk_clean_permissions() {
     # update all perms correctly in staging dir
     CURDIR=`pwd`
     echo -n "Updating app framework development ownership ... "
     cdproject
-    sudo chown -R vagrant:vagrant *
+    sudo chown -R {{ project_owner_devel }}:{{ project_group_devel }} *
     echo "done."
     echo -n "Updating app framework apache ownership ... "
     cdwww
-    sudo chown -R www-data:www-data *
+    sudo chown -R {{ project_owner_apache }}:{{ project_group_apache }} *
     echo "done."
+    appfwk_clean_pyc
+    appfwk_restart_services
     cd $CURDIR
 }
 

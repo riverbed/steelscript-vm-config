@@ -12,13 +12,20 @@
       state=directory mode=775
       owner={{ project_owner_devel }} group={{ project_group_devel }}
 
-- name: install steelscript packages and dependencies
+- name: deveopment - install steelscript packages and dependencies
   pip: name='file:///{{ steelscript_sources }}/{{ item.repo }}'
       extra_args='-e'
       virtualenv={{ virtualenv_devel }}
       chdir=/src
   with_items: steelscript_items
   sudo_user: vagrant
+  when: deployment_type == "development"
+
+- name: distribution config - install steelscript packages and dependencies
+  pip: name={{ item.pkg }} virtualenv={{ virtualenv_devel }}
+  with_items: steelscript_items
+  sudo_user: vagrant
+  when: deployment_type == "distribution"
 
 #
 # include development extras

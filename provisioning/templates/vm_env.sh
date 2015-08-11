@@ -8,9 +8,11 @@ alias ls='ls --color'
 
 export PROJECT_DEV_DIR={{ project_root_devel }}
 export PROJECT_DEV_VENV={{ virtualenv_devel }}
+export PROJECT_DEV_SITEPKGS=$PROJECT_DEV_VENV/lib/python2.7/site-packages
 
 export PROJECT_APACHE_DIR={{ project_root_apache }}
 export PROJECT_APACHE_VENV={{ virtualenv_apache }}
+export PROJECT_APACHE_SITEPKGS=$PROJECT_APACHE_VENV/lib/python2.7/site-packages
 
 APACHE_LOGDIR=/var/log/httpd
 export ERROR_LOG=$APACHE_LOGDIR/error.log
@@ -26,18 +28,19 @@ alias view_project_log='less $DEV_LOGDIR/log.txt'
 alias cdproject='cd $PROJECT_DEV_DIR'
 alias cdwww='cd $PROJECT_APACHE_DIR'
 alias cdshared='cd /vagrant'
-alias cdsitepackages='cd /home/vagrant/virtualenv/lib/python2.7/site-packages'
+alias cdsitepackages='cd $PROJECT_DEV_SITEPKGS'
 
 # Development aliases
-export SRC_DIR={{ steelscript_sources }}
-export PROGRESSD_DIR=$SRC_DIR/steelscript-appfwk/steelscript/appfwk/progressd
+{% if deployment_type == 'development' %}
+export PROGRESSD_DIR={{ steelscript_sources }}/steelscript-appfwk/steelscript/appfwk/progressd
+{% else %}
+export PROGRESSD_DIR=$PROJECT_APACHE_SITEPKGS/steelscript/appfwk/progressd
+{% endif %}
 
 alias start_progressd='cd $PROGRESSD_DIR && python progressd.py --path $PROJECT_DEV_DIR'
 alias start_celery='cd $PROJECT_DEV_DIR && rm -f logs/celery.txt && python manage.py celery worker -l DEBUG -f logs/celery.txt -c4 -n worker1.%h'
 alias start_flower='cd $PROJECT_DEV_DIR && python manage.py celery flower --port=8888'
 alias start_appfwk='cd $PROJECT_DEV_DIR && python manage.py runserver 0.0.0.0:8000'
-
-
 
 alias appfwk_dev_server='cdproject && $PROJECT_DEV_VENV/bin/python $PROJECT_DEV_DIR/manage.py runserver `facter ipaddress`:8000'
 alias run_ipython_notebook='mkdir -p ~/ipython_notebooks && cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --no-browser'
@@ -45,6 +48,15 @@ alias run_ipython_notebook='mkdir -p ~/ipython_notebooks && cd ~/ipython_noteboo
 alias virtualenv_dev='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 alias virtualenv_www='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 
+#
+# Create manage.py alias for operating on apache appfwk site
+# Enables operations like so:
+#  > manage shell_plus
+#  > manage collectstatic
+#  > manage reload
+# etc
+#
+alias manage='cdwww && sudo -u {{ project_owner_apache }} /home/vagrant/virtualenv/bin/python manage.py'
 
 # Activate virtual environment by default on login
 virtualenv_dev
@@ -67,13 +79,7 @@ upgrade_packages_from_dir() {
     for PKG in `ls $PKGDIR`; do
         /home/vagrant/virtualenv/bin/pip install -U --no-deps $PKGDIR/$PKG
     done
-    sudo apachectl restart
-}
-
-rotate_logs() {
-    echo -n "Rotating apache logs ... "
-    sudo logrotate -f /etc/logrotate.d/apache2
-    echo "done."
+    appfwk_restart_services
 }
 
 appfwk_clean_pyc() {
@@ -87,7 +93,7 @@ appfwk_restart_services() {
     echo "Restarting App Framework services ... "
     sudo service progressd restart
     sudo service celeryd restart
-    sudo service apachectl restart
+    sudo service httpd restart
 }
 
 appfwk_clean_permissions() {
@@ -106,10 +112,16 @@ appfwk_clean_permissions() {
     cd $CURDIR
 }
 
+rotate_logs() {
+    echo -n "Rotating apache logs ... "
+    sudo logrotate -f /etc/logrotate.d/apache2
+    echo "done."
+}
+
 appfwk_collect_logs() {
     echo -n "Collecting all log files and generating zipfile ... "
     cdwww
-    sudo $PORTAL_DEPLOY_VENV/bin/python manage.py collect_logs &> /dev/null
+    sudo $PROJECT_APACHE_VENV/bin/python manage.py collect_logs &> /dev/null
     LOGFILE=`ls -tr1 | grep debug | tail -1`
 
     if [[ -e /vagrant ]]; then

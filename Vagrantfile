@@ -44,7 +44,7 @@ Vagrant.configure("2") do |config|
   #config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
   #config.vm.provision "pre-provision", type: "shell" do |s|
-  #    s.inline = "F=/vagrant/packages/installed_pkgs_pre_provision.txt && if [ ! -e $F ]; then  dpkg --get-selections > $F; fi"
+  #    s.inline = "F=/vagrant/packages/installed_pkgs_pre_provision.txt && if [ ! -e $F ]; then yum list installed > $F; fi"
   #end
 
   config.vm.provision "ansible" do |ansible|
@@ -55,7 +55,7 @@ Vagrant.configure("2") do |config|
   end
 
   #config.vm.provision "post-provision", type: "shell" do |s|
-  #    s.inline = "F=/vagrant/packages/installed_pkgs_post_provision.txt && if [ ! -e $F ]; then dpkg --get-selections > $F; /home/vagrant/virtualenv/bin/pip freeze | grep -v ^-e > /vagrant/packages/installed_pkgs_python.txt; fi"
+  #    s.inline = "F=/vagrant/packages/installed_pkgs_post_provision.txt && if [ ! -e $F ]; then yum list installed > $F; /home/vagrant/virtualenv/bin/pip freeze | grep -v ^-e > /vagrant/packages/installed_pkgs_python.txt; fi"
   #end
 
 end

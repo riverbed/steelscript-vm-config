@@ -36,31 +36,12 @@ dev_django_db: django_devel_db
 dev_django_user: django_dev
 dev_django_password: djangoSteelScriptDev!
 
-
-steelscript_packages:
-    - reschema
-    - steelscript
-    - steelscript.netprofiler
-    - steelscript.netshark
-    - steelscript.appfwk
-    - steelscript.appfwk.business-hours
-    - steelscript.wireshark
-    - steelscript.cmdline
-    - steelscript.steelhead
-
-steelscript_repos:
-    - reschema
-    - steelscript
-    - steelscript-netprofiler
-    - steelscript-netshark
-    - steelscript-appfwk
-    - steelscript-appfwk-business-hours
-    - steelscript-wireshark
-    - steelscript-cmdline
-    - steelscript-steelhead
+# default deployment type will install from source repos
+deployment_type: development
 
 steelscript_items:
     - {pkg: 'reschema', repo: 'reschema'}
+    - {pkg: 'sleepwalker', repo: 'sleepwalker'}
     - {pkg: 'steelscript', repo: 'steelscript' }
     - {pkg: 'steelscript.netprofiler', repo: 'steelscript-netprofiler' }
     - {pkg: 'steelscript.netshark', repo: 'steelscript-netshark' }

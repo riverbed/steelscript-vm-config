@@ -3,6 +3,9 @@
   accelerate: false
   sudo: yes
   gather_facts: false
+  vars:
+      #deployment_type: 'development'
+      deployment_type: 'distribution'
 
   roles:
       # redhat os

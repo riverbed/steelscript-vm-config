@@ -41,11 +41,11 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "sources/", "/src"
 
   # avoid root mesg issues from https://github.com/mitchellh/vagrant/issues/1673
-  #config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
+  config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
-  #config.vm.provision "pre-provision", type: "shell" do |s|
-  #    s.inline = "F=/vagrant/packages/installed_pkgs_pre_provision.txt && if [ ! -e $F ]; then yum list installed > $F; fi"
-  #end
+  config.vm.provision "pre-provision", type: "shell" do |s|
+      s.inline = "F=/vagrant/packages/installed_pkgs_pre_provision.txt && if [ ! -e $F ]; then yum list installed > $F; fi"
+  end
 
   config.vm.provision "ansible" do |ansible|
       ansible.sudo = true
@@ -54,8 +54,8 @@ Vagrant.configure("2") do |config|
       #ansible.verbose = "vvvv"
   end
 
-  #config.vm.provision "post-provision", type: "shell" do |s|
-  #    s.inline = "F=/vagrant/packages/installed_pkgs_post_provision.txt && if [ ! -e $F ]; then yum list installed > $F; /home/vagrant/virtualenv/bin/pip freeze | grep -v ^-e > /vagrant/packages/installed_pkgs_python.txt; fi"
-  #end
+  config.vm.provision "post-provision", type: "shell" do |s|
+      s.inline = "F=/vagrant/packages/installed_pkgs_post_provision.txt && if [ ! -e $F ]; then yum list installed > $F; /home/vagrant/virtualenv/bin/pip freeze | grep -v ^-e > /vagrant/packages/installed_pkgs_python.txt; fi"
+  end
 
 end

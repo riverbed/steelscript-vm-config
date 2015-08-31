@@ -164,11 +164,11 @@
 # configure progressd to run as a service
 #
 
-- name: deployment - create /etc/init.d/progressd
+- name: development - create /etc/init.d/progressd
   template: src=etc.init.d.progressd.dev.j2
       dest=/etc/init.d/progressd
       owner=root group=root mode=755
-  when: deployment_type == "deployment"
+  when: deployment_type == "development"
 
 - name: distribution - create /etc/init.d/progressd
   template: src=etc.init.d.progressd.distrib.j2

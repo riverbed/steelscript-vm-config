@@ -14,9 +14,9 @@
       mode=775
       owner=vagrant group=vagrant
 
-- name: update bashrc to source vm_env.sh
+- name: update bash_profile to source vm_env.sh
   lineinfile:
-      dest=/home/vagrant/.bashrc
+      dest=/home/vagrant/.bash_profile
       line="source ~/.vm_env.sh"
       regexp="^source ~/.vm_env.sh"
       insertafter=EOF

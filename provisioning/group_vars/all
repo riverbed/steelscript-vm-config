@@ -116,6 +116,7 @@ system_packages_redhat:
     - libpng-devel
     - freetype-devel
     - graphviz
+    - ncurses-devel
 
     # networking packages
     - net-snmp

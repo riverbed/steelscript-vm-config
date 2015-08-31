@@ -1,9 +1,11 @@
 ---
 # common tasks for all redhat/centos machine types
 
+# apply 'vagrant' password to enable console access
+# http://docs.ansible.com/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
 - name: configure vagrant user
   user: name=vagrant comment="vagrant"
-
+        password="$6$rounds=100000$CFkLAwYtt8lj9wD1$S7yaZIyyiFeLlO//5mhdyc.H2BVl8KfgqnoGRYp6I.RaVnjgNeaDKKBBlvbAgBboiVNnFFn4xAwaqoOp.EzrI0"
 #
 # Configure proxy for caching rpm packages
 #

@@ -31,5 +31,8 @@
       - name: store last provision date
         shell: echo This VM was last provisioned on `date` > /etc/vagrant_last_provisioned
 
+      - name: update motd
+        shell: cat /etc/motd.tail /etc/vagrant_last_provisioned > /etc/motd
+
   handlers:
       - include: handlers.yml

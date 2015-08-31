@@ -52,24 +52,19 @@
 #
 # update MOTD and add LICENSE
 #
-#- name: disable default motd
-#  file: path={{ item }} mode=0644
-#  with_items:
-#    - /etc/update-motd.d/10-help-text
-#    - /etc/update-motd.d/91-release-upgrade
-#  ignore_errors: true
-#
-#- name: update login text
-#  template: src=templates/motd.tail
-#      dest=/etc/motd.tail
-#      mode=644
-#      owner=root group=root
-#
-#- name: add last provisioned message
-#  template: src=templates/motd_last_provisioned.sh
-#      dest=/etc/update-motd.d/98-last-provisioned
-#      mode=755
-#      owner=root group=root
+- name: update ssd config
+  template: src=sshd_config.j2
+      dest=/etc/ssh/sshd_config
+      mode=600
+      owner=root group=root
+  notify:
+      restart sshd
+
+- name: update login text
+  template: src=templates/motd.tail
+      dest=/etc/motd.tail
+      mode=644
+      owner=root group=root
 
 #
 # copy README and LICENSE

@@ -1,0 +1,4 @@
+# base_redhat handlers
+
+- name: restart sshd
+  service: name=sshd state=restarted

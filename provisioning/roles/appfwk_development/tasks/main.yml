@@ -1,0 +1,65 @@
+---
+#
+# setup development virtualenv and steelscript packages
+#
+- name: create virtualenv
+  shell: virtualenv {{ virtualenv_devel }}
+      creates={{ virtualenv_devel }}/bin/activate
+  sudo_user: vagrant
+
+- name: create source directory for redis and other 3rd party code
+  file: path={{ project_home_devel }}/src
+      state=directory mode=775
+      owner={{ project_owner_devel }} group={{ project_group_devel }}
+
+- name: development - install steelscript packages and dependencies
+  pip: name='file:///{{ steelscript_sources }}/{{ item.repo }}'
+      extra_args='-e'
+      virtualenv={{ virtualenv_devel }}
+      chdir=/src
+  with_items: steelscript_items
+  sudo_user: vagrant
+  when: deployment_type == "development"
+
+- name: distribution config - install steelscript packages and dependencies
+  pip: name={{ item.pkg }} virtualenv={{ virtualenv_devel }}
+  with_items: steelscript_items
+  sudo_user: vagrant
+  when: deployment_type == "distribution"
+
+#
+# include development extras
+#
+- name: install ipython notebook, flower and graphviz into virtualenv
+  pip: name={{ item }}
+      virtualenv={{ virtualenv_devel }}
+  with_items:
+      - ipython[all]
+      - matplotlib
+      - flower
+      - graphviz
+  sudo_user: vagrant
+
+#
+# create development appfwk project
+#
+- name: create app framework project directory
+  shell: >
+      . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_devel }}
+      chdir={{ project_home_devel }}
+      creates={{ project_root_devel }}
+  sudo_user: vagrant
+
+- name: copy local project settings
+  template: src=local_settings.j2
+      dest={{ project_root_devel }}/local_settings.py
+      mode=664
+      owner={{ project_owner_devel }} group={{ project_group_devel }}
+
+- name: reset framework with new settings
+  shell: >
+      {{ virtualenv_devel }}/bin/python manage.py reset_appfwk --drop-users --force && touch .initialized
+      chdir={{ project_root_devel }}
+      creates={{ project_root_devel }}/.initialized
+  sudo_user: vagrant
+

@@ -1,0 +1,107 @@
+---
+# configure apache2 for debian/ubuntu server types
+- hosts: all
+  accelerate: false
+  sudo: yes
+  gather_facts: false
+  vars_files:
+      - vars_common.yml
+
+  tasks:
+      #
+      # setup apache certificates
+      #
+
+      - name: SSL ... make local cert directory
+        file: path=/etc/ssl/localcerts
+            state=directory mode=775
+            owner={{ project_owner_apache }} group={{ project_group_apache }}
+
+      - name: SSL ... install local signed cert pem
+        template: src=templates/ssl_apache/selfsignedcerts/apache_local.pem
+            dest=/etc/ssl/localcerts/apache_local.pem
+            mode=600
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: SSL ... install local signed cert key
+        template: src=templates/ssl_apache/selfsignedcerts/apache_local_nopass.key
+            dest=/etc/ssl/localcerts/apache_local.key
+            mode=600
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: SSL ... apache - update ports.conf
+        template: src=templates/ssl_apache/ports.conf
+            dest=/etc/apache2/ports.conf
+            mode=664
+            owner=root group=root
+        notify:
+        - restart apache
+
+      #- name: apache - steelscript appfwk site template - non-ssl
+      #  template: src=templates/steelscript_appfwk_site.j2
+      #      dest=/etc/apache2/sites-available/steelscript_appfwk_site
+      #      mode=664
+      #      owner=root group=root
+      #  notify:
+      #  - restart apache
+
+      - name: SSL ... apache - steelscript appfwk site template
+        template: src=templates/ssl_apache/steelscript_appfwk_site_ssl.j2
+            dest=/etc/apache2/sites-available/steelscript_appfwk_site
+            mode=664
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: SSL ... enable apache ssl
+        shell: sudo a2enmod ssl
+            creates=/etc/apache2/mods-enabled/ssl.load
+
+      - name: SSL ... enable apache rewrite
+        shell: sudo a2enmod rewrite
+            creates=/etc/apache2/mods-enabled/rewrite.load
+
+      #
+      # setup apache config
+      #
+      - name: apache - add vagrant user to apache group
+        user:
+            name=vagrant
+            groups='www-data'
+            append=yes
+
+      - name: apache - set apache umask to 002
+        lineinfile:
+            dest=/etc/apache2/envvars
+            line="umask 002"
+            regexp="^umask 002"
+            insertafter=EOF
+            state=present
+
+      - name: apache - steelscript appfwk site template
+        template: src=templates/steelscript_appfwk_site.j2
+            dest=/etc/httpd/conf.d/steelscript_appfwk_site.conf
+            mode=664
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: apache - enable appfwk site
+        file: path=/etc/apache2/sites-enabled/001-steelscript_appfwk
+            src=/etc/apache2/sites-available/steelscript_appfwk_site
+            state=link
+            mode=664
+            owner=root group=root
+        notify:
+        - restart apache
+
+      - name: apache - disable default site
+        file: path=/etc/apache2/sites-enabled/000-default state=absent
+
+
+      - name: start and enable apache service
+        service: name=apache2 state=started enabled=yes

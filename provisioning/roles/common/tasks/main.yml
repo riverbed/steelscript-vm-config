@@ -1,0 +1,24 @@
+---
+# common tasks for all machine types
+
+- name: install python pip
+  easy_install: name=pip
+
+- name: install python system packages
+  pip: name={{ item }}
+  with_items: python_packages
+
+- name: steelscript helper functions and aliases
+  template: src=templates/vm_env.sh
+      dest={{ project_home_devel }}/.vm_env.sh
+      mode=775
+      owner=vagrant group=vagrant
+
+- name: update bash_profile to source vm_env.sh
+  lineinfile:
+      dest=/home/vagrant/.bash_profile
+      line="source ~/.vm_env.sh"
+      regexp="^source ~/.vm_env.sh"
+      insertafter=EOF
+      state=present
+

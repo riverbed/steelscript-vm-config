@@ -1,24 +1,46 @@
 #!/usr/bin/sh
+
+# basic environment config
+export TERM=xterm-256color
+# disable default which overwrites terminal title
+export PROMPT_COMMAND=
+alias ls='ls --color'
+
 export PROJECT_DEV_DIR={{ project_root_devel }}
 export PROJECT_DEV_VENV={{ virtualenv_devel }}
+export PROJECT_DEV_SITEPKGS=$PROJECT_DEV_VENV/lib/python2.7/site-packages
 
 export PROJECT_APACHE_DIR={{ project_root_apache }}
 export PROJECT_APACHE_VENV={{ virtualenv_apache }}
+export PROJECT_APACHE_SITEPKGS=$PROJECT_APACHE_VENV/lib/python2.7/site-packages
 
-APACHE_LOGDIR=/var/log/apache2
+APACHE_LOGDIR=/var/log/httpd
 export ERROR_LOG=$APACHE_LOGDIR/error.log
 export ACCESS_LOG=$APACHE_LOGDIR/other_vhosts_access.log
-USERGROUP=www-data
+USERGROUP=apache
 
 export DEV_LOGDIR=$PROJECT_DEV_DIR/logs
 
 alias view_err_log='less $ERROR_LOG'
 alias view_access_log='less $ACCESS_LOG'
-alias view_project_log='less $DEV_LOGDIR/log.txt'
+alias view_appfwk_log='less /var/log/appfwk'
 
 alias cdproject='cd $PROJECT_DEV_DIR'
 alias cdwww='cd $PROJECT_APACHE_DIR'
 alias cdshared='cd /vagrant'
+alias cdsitepackages='cd $PROJECT_DEV_SITEPKGS'
+
+# Development aliases
+{% if deployment_type == 'development' %}
+export PROGRESSD_DIR={{ steelscript_sources }}/steelscript-appfwk/steelscript/appfwk/progressd
+{% else %}
+export PROGRESSD_DIR=$PROJECT_APACHE_SITEPKGS/steelscript/appfwk/progressd
+{% endif %}
+
+alias start_progressd='cd $PROGRESSD_DIR && python progressd.py --path $PROJECT_DEV_DIR'
+alias start_celery='cd $PROJECT_DEV_DIR && rm -f logs/celery.txt && python manage.py celery worker -l DEBUG -f logs/celery.txt -c4 -n worker1.%h'
+alias start_flower='cd $PROJECT_DEV_DIR && python manage.py celery flower --port=8888'
+alias start_appfwk='cd $PROJECT_DEV_DIR && python manage.py runserver 0.0.0.0:8000'
 
 alias appfwk_dev_server='cdproject && $PROJECT_DEV_VENV/bin/python $PROJECT_DEV_DIR/manage.py runserver `facter ipaddress`:8000'
 alias run_ipython_notebook='mkdir -p ~/ipython_notebooks && cd ~/ipython_notebooks && ipython notebook --ip=`facter ipaddress` --no-browser'
@@ -26,9 +48,15 @@ alias run_ipython_notebook='mkdir -p ~/ipython_notebooks && cd ~/ipython_noteboo
 alias virtualenv_dev='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 alias virtualenv_www='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activate'
 
-# setup terminal options
-export TERM=xterm-256color
-
+#
+# Create manage.py alias for operating on apache appfwk site
+# Enables operations like so:
+#  > manage shell_plus
+#  > manage collectstatic
+#  > manage reload
+# etc
+#
+alias manage='cdwww && sudo -u {{ project_owner_apache }} /home/vagrant/virtualenv/bin/python manage.py'
 
 # Activate virtual environment by default on login
 virtualenv_dev
@@ -51,7 +79,37 @@ upgrade_packages_from_dir() {
     for PKG in `ls $PKGDIR`; do
         /home/vagrant/virtualenv/bin/pip install -U --no-deps $PKGDIR/$PKG
     done
-    sudo apachectl restart
+    appfwk_restart_services
+}
+
+appfwk_clean_pyc() {
+    cdwww
+    echo -n "Cleaning up old pyc files ... "
+    sudo find . -name "*.pyc" -exec rm {} \;
+    echo "done."
+}
+
+appfwk_restart_services() {
+    echo "Restarting App Framework services ... "
+    sudo service progressd restart
+    sudo service celeryd restart
+    sudo service httpd restart
+}
+
+appfwk_clean_permissions() {
+    # update all perms correctly in staging dir
+    CURDIR=`pwd`
+    echo -n "Updating app framework development ownership ... "
+    cdproject
+    sudo chown -R {{ project_owner_devel }}:{{ project_group_devel }} *
+    echo "done."
+    echo -n "Updating app framework apache ownership ... "
+    cdwww
+    sudo chown -R {{ project_owner_apache }}:{{ project_group_apache }} *
+    echo "done."
+    appfwk_clean_pyc
+    appfwk_restart_services
+    cd $CURDIR
 }
 
 rotate_logs() {
@@ -60,24 +118,10 @@ rotate_logs() {
     echo "done."
 }
 
-appfwk_clean_perms() {
-    # update all perms correctly in staging dir
-    CURDIR=`pwd`
-    echo -n "Updating app framework development ownership ... "
-    cdproject
-    sudo chown -R vagrant:vagrant *
-    echo "done."
-    echo -n "Updating app framework apache ownership ... "
-    cdwww
-    sudo chown -R www-data:www-data *
-    echo "done."
-    cd $CURDIR
-}
-
 appfwk_collect_logs() {
     echo -n "Collecting all log files and generating zipfile ... "
     cdwww
-    sudo $PORTAL_DEPLOY_VENV/bin/python manage.py collect_logs &> /dev/null
+    sudo $PROJECT_APACHE_VENV/bin/python manage.py collect_logs &> /dev/null
     LOGFILE=`ls -tr1 | grep debug | tail -1`
 
     if [[ -e /vagrant ]]; then

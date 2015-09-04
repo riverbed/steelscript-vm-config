@@ -1,0 +1,57 @@
+---
+# common tasks for debian/ubuntu machine types
+
+- name: configure apt-cache
+  apt: pkg=squid-deb-proxy-client update_cache=yes cache_valid_time=3600
+      state=present
+
+- name: start zeroconf service
+  service: name=avahi-daemon state=started enabled=yes
+
+- name: install core system, networking, and python packages
+  apt: pkg={{ item }} update_cache=yes cache_valid_time=3600
+      state=present
+  with_items: system_packages
+
+- name: update openssl
+  apt: pkg=openssl update_cache=yes cache_valid_time=3600
+      state=latest
+
+- name: install core system, networking, and python packages
+  apt: name={{ item }} state=present
+  with_items: system_packages
+
+#
+# update MOTD and add LICENSE
+#
+- name: disable default motd
+  file: path={{ item }} mode=0644
+  with_items:
+    - /etc/update-motd.d/10-help-text
+    - /etc/update-motd.d/91-release-upgrade
+  ignore_errors: true
+
+- name: update login text
+  template: src=templates/motd.tail
+      dest=/etc/motd.tail
+      mode=644
+      owner=root group=root
+
+- name: add last provisioned message
+  template: src=templates/motd_last_provisioned.sh
+      dest=/etc/update-motd.d/98-last-provisioned
+      mode=755
+      owner=root group=root
+
+- name: copy readme
+  template: src=templates/README
+      dest=/home/vagrant/README
+      mode=644
+      owner=vagrant group=vagrant
+
+- name: copy license
+  template: src=templates/LICENSE
+      dest=/home/vagrant/LICENSE
+      mode=644
+      owner=vagrant group=vagrant
+

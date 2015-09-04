@@ -156,6 +156,8 @@
 
 - name: enable celeryd service
   service: name=celeryd enabled=yes
+  notify:
+      - restart celeryd
 
 - name: start celeryd service
   shell: service celeryd start
@@ -182,6 +184,8 @@
 
 - name: enable progressd service levels
   service: name=progressd enabled=yes
+  notify:
+      - restart progressd
 
 - name: start progressd service
   shell: service progressd start

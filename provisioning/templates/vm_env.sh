@@ -23,7 +23,7 @@ export DEV_LOGDIR=$PROJECT_DEV_DIR/logs
 
 alias view_err_log='less $ERROR_LOG'
 alias view_access_log='less $ACCESS_LOG'
-alias view_project_log='less $DEV_LOGDIR/log.txt'
+alias view_appfwk_log='less /var/log/appfwk'
 
 alias cdproject='cd $PROJECT_DEV_DIR'
 alias cdwww='cd $PROJECT_APACHE_DIR'

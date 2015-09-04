@@ -36,6 +36,7 @@
   with_items:
     - 80/tcp
     - 443/tcp
+    - 8888/tcp
 
 #
 # Configure and enable ntpd

@@ -4,7 +4,7 @@
 # description: SteelScript AppFwk progressd daemon
 # processname: progressd
 
-dir="{{ steelscript_sources }}/steelscript-appfwk/steelscript/appfwk/progressd"
+dir="{{ virtualenv_apache }}/lib/python2.7/site-packages/steelscript/appfwk/progressd"
 user="{{ project_owner_apache }}"
 cmd="{{ virtualenv_apache }}/bin/python progressd.py --path {{ project_root_apache }} --port {{ apache_progressd_port }}"
 

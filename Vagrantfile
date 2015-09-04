@@ -7,8 +7,10 @@
 # Configure 'sources' symlink, will abort if link already exists
 system("
     if [ #{ARGV[0]} == 'up' ] || [ #{ARGV[0]} == 'provision' ]; then
-        cd dev
-        ./link-steelscript.py
+        if [ $(grep -c '[^#]deployment_type.*distribution' provisioning/provision.yml) -ne 0 ]; then
+            cd dev
+            ./link-steelscript.py
+        fi
     fi
 ")
 

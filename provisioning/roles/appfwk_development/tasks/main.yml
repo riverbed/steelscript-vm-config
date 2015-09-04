@@ -12,7 +12,7 @@
       state=directory mode=775
       owner={{ project_owner_devel }} group={{ project_group_devel }}
 
-- name: deveopment - install steelscript packages and dependencies
+- name: development - install steelscript packages and dependencies
   pip: name='file:///{{ steelscript_sources }}/{{ item.repo }}'
       extra_args='-e'
       virtualenv={{ virtualenv_devel }}

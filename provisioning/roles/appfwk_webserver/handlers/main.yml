@@ -2,9 +2,9 @@
 #
 # Service handlers
 #
-- name: restart celery
+- name: restart celeryd
   service: name=celeryd state=restarted
 
 
-- name: reload progressd
+- name: restart progressd
   service: name=progressd state=restarted

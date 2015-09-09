@@ -155,12 +155,9 @@
     chkconfig --add celeryd
 
 - name: enable celeryd service
-  service: name=celeryd enabled=yes
+  service: name=celeryd enabled=yes state=started
   notify:
       - restart celeryd
-
-- name: start celeryd service
-  shell: service celeryd start
 
 #
 # configure progressd to run as a service
@@ -183,9 +180,6 @@
     chkconfig --add progressd
 
 - name: enable progressd service levels
-  service: name=progressd enabled=yes
+  service: name=progressd enabled=yes state=started
   notify:
       - restart progressd
-
-- name: start progressd service
-  shell: service progressd start

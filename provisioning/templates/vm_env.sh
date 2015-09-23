@@ -56,7 +56,7 @@ alias virtualenv_www='deactivate &>/dev/null; source $PROJECT_DEV_VENV/bin/activ
 #  > manage reload
 # etc
 #
-alias manage='cdwww && sudo -u {{ project_owner_apache }} /home/vagrant/virtualenv/bin/python manage.py'
+alias manage='cdwww && sudo -u {{ project_owner_apache }} /home/vagrant/virtualenv/bin/python manage.py && cd -'
 
 # Activate virtual environment by default on login
 virtualenv_dev

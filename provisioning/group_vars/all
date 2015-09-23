@@ -50,6 +50,8 @@ steelscript_items:
     - {pkg: 'steelscript.wireshark', repo: 'steelscript-wireshark' }
     - {pkg: 'steelscript.cmdline', repo: 'steelscript-cmdline' }
     - {pkg: 'steelscript.steelhead', repo: 'steelscript-steelhead' }
+    - {pkg: 'steelscript.scc', repo: 'steelscript-scc' }
+    - {pkg: 'steelscript.stock', repo: 'steelscript-stock' }
 
 system_packages_debian:
     # core packages

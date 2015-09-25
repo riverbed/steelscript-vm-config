@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+[1.0.0]
+ * Switch base os from Ubuntu to CentOS 7
+ * Configure celery, redis, progressd as services for new Appfwk
+ * Many other updates and configuration improvements
+
 [0.9.4]
  * Single network interface, and update vmware config
  * Add tshark path to settings

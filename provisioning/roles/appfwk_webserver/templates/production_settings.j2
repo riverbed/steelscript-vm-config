@@ -14,7 +14,11 @@ PROGRESSD_PORT = "{{ apache_progressd_port }}"
 
 # For production, turn off debugging as it causes memory issues
 DEBUG = False
-ALLOWED_HOSTS = ['127.0.0.1']
+
+# Disable host header verification
+# For greater security, replace '*' with actual hostname or IP address
+# https://docs.djangoproject.com/en/1.7/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = ['*']
 
 # Logging
 

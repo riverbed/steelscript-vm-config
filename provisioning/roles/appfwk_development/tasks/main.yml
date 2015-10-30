@@ -63,3 +63,13 @@
       creates={{ project_root_devel }}/.initialized
   sudo_user: vagrant
 
+#
+# create development workspace
+#
+- name: create steelscript workspace
+  shell: >
+      . {{ virtualenv_devel }}/bin/activate && steel mkworkspace -d steelscript-workspace
+      chdir={{ project_home_devel }}
+      creates={{ project_home_devel }}/steelscript-workspace
+  sudo_user: vagrant
+

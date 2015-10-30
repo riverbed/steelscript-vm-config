@@ -166,7 +166,9 @@ considered to improve security are:
         vagrant/.ssh/authorized_keys
       - Update sudoers config (vagrant has passwordless sudo)
    - Apache Server
+      - Serve pages via HTTPS
       - Replace self-signed SSL certs
+      - Enable host header verification via ALLOWED_HOSTS in /steelscript/www/local_settings.py
       - Change root mysql password from 'vagrantRoot!'
       - Change django database 'django_appfwk_db' password from
         'djangoSteelScript!'

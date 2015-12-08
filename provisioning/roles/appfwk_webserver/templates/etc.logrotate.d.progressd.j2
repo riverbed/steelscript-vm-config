@@ -1,0 +1,9 @@
+/var/log/progressd.log /var/log/progressd.err {
+    daily
+    rotate 14
+    missingok
+    sharedscripts
+    postrotate
+        /bin/systemctl restart progressd > /dev/null 2>/dev/null || true
+    endscript
+}

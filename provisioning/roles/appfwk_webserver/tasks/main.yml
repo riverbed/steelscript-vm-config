@@ -183,3 +183,17 @@
   service: name=progressd enabled=yes state=started
   notify:
       - restart progressd
+
+
+#
+# add logrotate configs for syslog
+#
+- name: create logrotate config for appfwk
+  template: src=etc.logrotate.d.appfwk.j2
+      dest=/etc/logrotate.d/appfwk
+      owner=root group=root mode=644
+
+- name: create logrotate config for progressd
+  template: src=etc.logrotate.d.progressd.j2
+      dest=/etc/logrotate.d/progressd
+      owner=root group=root mode=644

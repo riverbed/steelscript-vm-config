@@ -12,6 +12,8 @@
       state=directory mode=775
       owner={{ project_owner_devel }} group={{ project_group_devel }}
 
+# install development packages in editable mode
+# this is primary development approach
 - name: development - install steelscript packages and dependencies
   pip: name='file:///{{ steelscript_sources }}/{{ item.repo }}'
       extra_args='-e'
@@ -21,6 +23,19 @@
   sudo_user: vagrant
   when: deployment_type == "development"
 
+# install the development packages directly
+# use this for deploying a vm with latest dev versions
+- name: development - locally install steelscript packages and dependencies
+  pip: name='file:///{{ steelscript_sources }}/{{ item.repo }}'
+      virtualenv={{ virtualenv_devel }}
+      chdir=/src
+  with_items: steelscript_items
+  sudo_user: vagrant
+  when: deployment_type == "development-local"
+  #'
+
+# install released packages directly
+# use this for stable releases
 - name: distribution config - install steelscript packages and dependencies
   pip: name={{ item.pkg }} virtualenv={{ virtualenv_devel }}
   with_items: steelscript_items

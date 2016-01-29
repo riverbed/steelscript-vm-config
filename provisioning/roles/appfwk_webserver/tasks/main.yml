@@ -173,7 +173,8 @@
   template: src=etc.init.d.progressd.distrib.j2
       dest=/etc/init.d/progressd
       owner=root group=root mode=755
-  when: deployment_type == "distribution"
+  when: deployment_type == "distribution" or
+        deployment_type == "development-local"
 
 - name: setup progressd service runlevels
   shell: >

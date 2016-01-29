@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+[1.0.1]
+ * Rotate appfwk-related logfiles
+ * Include SteelScript development workspace in /home/vagrant
+ * Avoid memory leaks with celery workers
+ * Add 'development-local' build configuration
+ * Minor fixes
+
 [1.0.0]
  * Switch base os from Ubuntu to CentOS 7
  * Configure celery, redis, progressd as services for new Appfwk

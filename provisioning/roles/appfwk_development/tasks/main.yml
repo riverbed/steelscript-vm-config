@@ -25,14 +25,15 @@
 
 # install the development packages directly
 # use this for deploying a vm with latest dev versions
+# (note this has one less slash after file: because pip complains otherwise)
 - name: development - locally install steelscript packages and dependencies
-  pip: name='file:///{{ steelscript_sources }}/{{ item.repo }}'
+  pip: name='file://{{ steelscript_sources }}/{{ item.repo }}'
+      extra_args='-v'
       virtualenv={{ virtualenv_devel }}
       chdir=/src
   with_items: steelscript_items
   sudo_user: vagrant
   when: deployment_type == "development-local"
-  #'
 
 # install released packages directly
 # use this for stable releases

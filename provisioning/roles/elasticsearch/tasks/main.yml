@@ -1,0 +1,9 @@
+---
+# install elasticsearch via docker 
+
+- name: Install elasticsearch container
+  shell: sudo docker pull elasticsearch
+
+- name: Run elasticsearch container
+  shell: docker run -p 9200:9200 -p 9300:9300 -d elasticsearch 
+

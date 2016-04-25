@@ -1,0 +1,10 @@
+---
+- name: update yum packages
+  shell: sudo yum update  
+
+- name: install docker engine.
+  shell: curl -fsSL https://get.docker.com/ | sh
+
+- name: start the Docker daemon. 
+  service: name=docker state=started
+

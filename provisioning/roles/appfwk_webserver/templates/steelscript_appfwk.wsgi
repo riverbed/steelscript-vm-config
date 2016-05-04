@@ -19,5 +19,5 @@ import django.core.management
 django.core.management.find_management_module = find_management_module
 
 
-import django.core.handlers.wsgi
-application = django.core.handlers.wsgi.WSGIHandler()
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()

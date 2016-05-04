@@ -1,0 +1,10 @@
+---
+#
+# Service handlers
+#
+- name: restart celeryd
+  service: name=celeryd state=restarted
+
+
+- name: restart progressd
+  service: name=progressd state=restarted

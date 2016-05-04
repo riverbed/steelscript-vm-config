@@ -1,0 +1,151 @@
+---
+project_name: steelscript_appfwk
+
+steelscript_repo: https://github.com/riverbed/steelscript.git
+project_repo: https://github.com/riverbed/steelscript-appfwk.git
+
+project_home_devel: /home/vagrant
+project_root_devel: "{{ project_home_devel }}/appfwk_project"
+project_owner_devel: vagrant
+project_group_devel: vagrant
+virtualenv_devel: "{{ project_home_devel }}/virtualenv"
+
+project_home_apache: /steelscript
+project_root_apache: "{{ project_home_apache }}/www"
+project_wsgi: "{{ project_root_apache }}"
+project_owner_apache: apache
+project_group_apache: apache
+# For now, the apache virtual env uses the same as the devel
+# virtualenv
+virtualenv_apache: "{{ project_home_devel }}/virtualenv"
+apache_progressd_port: 5001
+
+# location of steelscript source repos inside VM
+# should align with shared directory from Vagrantfile
+steelscript_sources: /src
+
+db_root_password: vagrantRoot!
+
+# apache db config
+apache_django_db: django_apache_db
+apache_django_user: django_apache
+apache_django_password: djangoSteelScript!
+
+# development db config
+dev_django_db: django_devel_db
+dev_django_user: django_dev
+dev_django_password: djangoSteelScriptDev!
+
+# default deployment type will install from source repos
+deployment_type: development
+
+steelscript_items:
+    - {pkg: 'reschema', repo: 'reschema'}
+    - {pkg: 'sleepwalker', repo: 'sleepwalker'}
+    - {pkg: 'steelscript', repo: 'steelscript' }
+    - {pkg: 'steelscript.netprofiler', repo: 'steelscript-netprofiler' }
+    - {pkg: 'steelscript.netshark', repo: 'steelscript-netshark' }
+    - {pkg: 'steelscript.appfwk', repo: 'steelscript-appfwk' }
+    - {pkg: 'steelscript.appfwk.business-hours', repo: 'steelscript-appfwk-business-hours' }
+    - {pkg: 'steelscript.wireshark', repo: 'steelscript-wireshark' }
+    - {pkg: 'steelscript.cmdline', repo: 'steelscript-cmdline' }
+    - {pkg: 'steelscript.steelhead', repo: 'steelscript-steelhead' }
+    - {pkg: 'steelscript.scc', repo: 'steelscript-scc' }
+    - {pkg: 'steelscript.stock', repo: 'steelscript-stock' }
+
+system_packages_debian:
+    # core packages
+    - build-essential
+    - man-db
+    - git-core
+    - vim
+    - tig
+    - emacs
+    - python-keyczar
+    # networking packages
+    - snmp
+    - snmpd
+    - openldap-dev
+    - curl
+    - wget
+    - wireshark
+    - tshark
+    # database packages
+    - mysql-server
+    - libmysqlclient-dev
+    # python packages
+    - python
+    - python-setuptools
+    - python-dev
+    - python-pip
+    - sqlite3
+    - python-matplotlib
+    - python-imaging
+    - python-ldap
+    - ipython-notebook
+    - python-nose
+    - libpng12-dev
+    - libfreetype6-dev
+    # web server packages
+    - apache2
+    - ssl-cert
+    - libapache2-mod-wsgi
+    - unzip
+
+system_packages_redhat:
+    # core packages
+    - ntp
+    - zsh
+    - git
+    #- tig - unavailable from yum
+    - tree
+    - vim-enhanced
+    - unzip
+    #- emacs
+    #- libselinux-python
+    #- python-keyczar
+    # dev packages
+    - gcc-c++
+    - python-devel
+    - sqlite-devel
+    - zlib-devel
+
+    # dev libraries for other packages
+    #- openssl-devel
+    #- bzip2-devel
+    #- openldap-devel
+    #- libxslt-devel
+    - libpng-devel
+    - freetype-devel
+    - graphviz
+    - ncurses-devel
+
+    # networking packages
+    - net-snmp
+    - curl
+    - wget
+    - wireshark
+
+    # python packages
+    - python
+    - python-setuptools
+
+    # web server packages
+    - postgresql
+    - postgresql-server
+    - postgresql-devel
+    - postgresql-contrib
+    - httpd
+    - openssl
+    - mod_ssl
+    - mod_wsgi
+
+system_packages: "{{ system_packages_redhat }}"
+
+python_packages:
+    - pip
+    - pysnmp
+    - psycopg2
+    - supervisor
+    - virtualenv
+    - ansible

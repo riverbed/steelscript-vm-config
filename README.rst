@@ -16,8 +16,8 @@ Requirements
 ------------
 
 * `VirtualBox <http://www.virtualbox.org/>`_
-* `Vagrant <http://www.vagrantup.com/>`_ - version 1.6.2 or later
-* `Ansible <http://www.ansibleworks.com>`_ - version 1.3.4 or later
+* `Vagrant <http://www.vagrantup.com/>`_ - version 1.7.2 or later
+* `Ansible <http://www.ansibleworks.com>`_ - version 1.9.2 or later
 * `git <http://git-scm.com/downloads>`_
 
 Installation
@@ -35,8 +35,9 @@ Installation
    is not yet fully supported and will fail when trying to ``pip install`` it. An extra
    step is included in Step 4 to workaround this.
 
-2. Clone this repo via the following command, or using one of the Github GUI
-   clients, click the button: Clone in {platform}:
+2. Clone this repo using one of the Github GUI clients, or by clicking the 
+   button in the github project page labeled ``Clone in Desktop``, 
+   or via the following CLI command:
 
 .. code-block:: console
 
@@ -51,19 +52,13 @@ Installation
 4. If using Windows, run the ``vmconfig.bat`` file in this directory.  This just copies
    ``Vagrantfile.win`` to ``Vagrantfile``.
 
-5. Install the vagrant plugin 'vagrant-vbguest'.
-
-.. code-block:: console
-
-        $ vagrant plugin install vagrant-vbguest
-
 5. Provision a new Vagrant VM:
 
 .. code-block:: console
 
         $ vagrant up
 
-6. A fresh install will take between 10-20 minutes depending on your internet connection.
+6. A fresh install will take between 20-30 minutes depending on your internet connection.
 
 7. Once completed, a new virtual machine will be waiting with SteelScript
    Application Framework and IPython Notebooks ready.

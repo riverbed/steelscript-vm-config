@@ -1,0 +1,65 @@
+# Copyright (c) 2014 Riverbed Technology, Inc.
+#
+# This software is licensed under the terms and conditions of the MIT License
+# accompanying the software ("License").  This software is distributed "AS IS"
+# as set forth in the License.
+
+WSGISocketPrefix /var/run/wsgi
+WSGIPythonHome {{ virtualenv_devel }}
+
+#<VirtualHost *:80>
+#    WSGIPassAuthorization On
+#    Alias /static {{ project_root_apache }}/static
+#
+#    <Directory {{ project_root_apache }}/static>
+#        Require all granted
+#    </Directory>
+#
+#    <Directory {{ project_root_apache }}
+#        <Files steelscript_appfwk.wsgi>
+#            Require all granted
+#        </Files>
+#    </Directory>
+#
+#    WSGIScriptAlias / {{ project_wsgi }}/steelscript_appfwk.wsgi
+#    WSGIDaemonProcess {{ project_name }} processes=2
+#    WSGIProcessGroup {{ project_name }}
+#</VirtualHost>
+
+# This section is for secured, https (SSL) access
+# Comment the <VirtualHost> section above, uncomment the lines below,
+# including the "NameVirtualHost" line, and generate
+# the appropriate server keys as follows:
+#   RHEL/CentOS/SL:
+#       http://wiki.centos.org/HowTos/Https
+#   Debian/Ubuntu:
+#       https://wiki.debian.org/Self-Signed_Certificate
+
+
+# Redirect all http -> https
+RewriteEngine on
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI}
+
+<VirtualHost *:443>
+        SSLEngine on
+        SSLCertificateFile /etc/pki/tls/certs/localhost.crt
+        SSLCertificateKeyFile /etc/pki/tls/private/localhost.key
+        WSGIPassAuthorization On
+        Alias /static {{ project_root_apache }}/static
+
+        <Directory {{ project_root_apache }}/static>
+            Require all granted
+        </Directory>
+
+        <Directory {{ project_root_apache }}>
+            <Files steelscript_appfwk.wsgi>
+                Require all granted
+            </Files>
+        </Directory>
+
+        WSGIScriptAlias / {{ project_wsgi }}/steelscript_appfwk.wsgi
+        WSGIDaemonProcess {{ project_name }} processes=2
+        WSGIProcessGroup {{ project_name }}
+</VirtualHost>
+

@@ -1,0 +1,51 @@
+---
+# configure mysql for any server type
+#
+# setup mysql database
+#
+
+#
+# setup mysql database
+#
+- name: mysql - change root user password on first run
+  mysql_user: login_user=root
+              login_password=''
+              name=root
+              password={{ mysql_root_password }}
+              priv=*.*:ALL,GRANT
+              host={{ item }}
+  with_items:
+    - $ansible_hostname
+    - 127.0.0.1
+    - ::1
+    - localhost
+  ignore_errors: true
+
+- name: mysql - add App Framework Database
+  mysql_db: name={{ mysql_django_db }}
+            state=present
+            login_user=root
+            login_password={{ mysql_root_password }}
+
+- name: mysql - add App Framework django user
+  mysql_user: name={{ mysql_django_user }}
+              password={{ mysql_django_password }}
+              priv={{ mysql_django_db }}.*:ALL,GRANT
+              host={{ item }}
+              login_user=root
+              login_password={{ mysql_root_password }}
+  with_items:
+    - $ansible_hostname
+    - 127.0.0.1
+    - ::1
+    - localhost
+  #ignore_errors: true
+
+# see https://github.com/ansible/ansible/issues/3572
+# command is ubuntu 12.04 specific
+- name: enable default mysql init scripts
+  shell: update-rc.d mysql defaults
+
+- name: start and enable mysql service
+  service: name=mysql state=started enabled=yes
+

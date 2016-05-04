@@ -1,0 +1,81 @@
+---
+# configure apache (httpd) for Red Hat server types
+
+#
+# setup apache certificates and SSL
+#
+# http://wiki.centos.org/HowTos/Https
+#
+# CentOS seems to include a default localhost cert which
+# is probably sufficient since this would be insecure anyways
+
+#- name: SSL ... create and install self-signed cert
+#  template: src=templates/ssl_apache/selfsignedcerts/apache_local_nopass.key
+#      dest=/etc/ssl/localcerts/apache_local.key
+#      mode=600
+#      owner=root group=root
+#  command: >
+#      openssl req -new -nodes -x509 -subj "/C=US/ST=Massachusetts/L=Cambridge/O=IT/CN=${ansible_fqdn}" -days 3650 -keyout /etc/pki/private/apache.key -out /etc/pki/tls/certs/apache.crt -extensions v3_ca
+#      creates=/etc/pki/tls/certs/apache.crt
+#      mode=600
+#      owner=root group=root
+#  notify:
+#  - restart apache
+
+#- name: SSL ... apache - update ports.conf
+#  template: src=templates/ssl_apache/ports.conf
+#      dest=/etc/apache2/ports.conf
+#      mode=664
+#      owner=root group=root
+#  notify:
+#  - restart apache
+#
+#
+#- name: apache - steelscript appfwk site template - SSL
+#  template: src=steelscript_appfwk_site_ssl.j2
+#      dest=/etc/httpd/conf.d/steelscript_appfwk_site_ssl.conf
+#      mode=664
+#      owner=root group=root
+#  notify:
+#  - restart apache
+
+#
+# setup apache non-SSL
+#
+
+- name: apache - steelscript appfwk site template - non-SSL
+  template: src=steelscript_appfwk_site_http.j2
+      dest=/etc/httpd/conf.d/steelscript_appfwk_site_http.conf
+      mode=664
+      owner=root group=root
+  notify:
+  - restart apache
+
+
+#
+# Configure apache
+#
+
+#- name: apache - set apache umask to 002
+#  lineinfile:
+#      dest=/etc/apache2/envvars
+#      line="umask 002"
+#      regexp="^umask 002"
+#      insertafter=EOF
+#      state=present
+
+
+- name: start and enable apache service
+  service: name=httpd state=started enabled=yes
+
+#
+# turn of PrivateTmp for apache
+#
+- name: apache disable PrivateTmp
+  lineinfile: >
+    dest=/etc/systemd/system/multi-user.target.wants/httpd.service
+    regexp='PrivateTmp'
+    line='PrivateTmp=false'
+  notify:
+  - restart apache
+  - reload systemd

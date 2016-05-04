@@ -8,3 +8,8 @@
 .vagrant
 vagrant_ansible_inventory_default
 packages/installed_pkgs_*
+
+dev/steelscript*
+dev/reschema
+dev/reinstall.sh
+dev/rungit

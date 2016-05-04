@@ -1,0 +1,86 @@
+---
+# common tasks for all redhat/centos machine types
+
+# apply 'vagrant' password to enable console access
+# http://docs.ansible.com/faq.html#how-do-i-generate-crypted-passwords-for-the-user-module
+- name: configure vagrant user
+  user: name=vagrant comment="vagrant"
+        password="$6$rounds=100000$CFkLAwYtt8lj9wD1$S7yaZIyyiFeLlO//5mhdyc.H2BVl8KfgqnoGRYp6I.RaVnjgNeaDKKBBlvbAgBboiVNnFFn4xAwaqoOp.EzrI0"
+#
+# Configure proxy for caching rpm packages
+#
+#- name: copy base repos
+#  template: src=CentOS-Base.repo.j2
+#      dest=/etc/yum.repos.d/CentOS-Base.repo
+#
+#- name: copy yum.conf
+#  template: src=yum.conf.j2
+#      dest=/etc/yum.conf
+#      mode=644
+
+#
+# Install Base Packages
+#
+- name: install core system, networking, and python packages
+  yum: name={{ item }} state=present
+  with_items: system_packages
+
+#
+# Open ports 80/443 TCP
+#
+- name: open firewall ports 80/443 TCP
+  firewalld: port={{ item }}
+      state=enabled
+      permanent=true
+      immediate=true
+  with_items:
+    - 80/tcp
+    - 443/tcp
+    - 8888/tcp
+
+#
+# Configure and enable ntpd
+#
+- name: configure ntpd
+  # add -x option
+  lineinfile: >
+      dest=/etc/sysconfig/ntpd
+      regexp='OPTIONS'
+      line='OPTIONS="-g -x"'
+      state=present
+
+- name: enable ntpd
+  service: name=ntpd state=started enabled=yes
+
+#
+# update MOTD and add LICENSE
+#
+- name: update ssd config
+  template: src=sshd_config.j2
+      dest=/etc/ssh/sshd_config
+      mode=600
+      owner=root group=root
+  notify:
+      restart sshd
+
+- name: update login text
+  template: src=templates/motd.tail
+      dest=/etc/motd.tail
+      mode=644
+      owner=root group=root
+
+#
+# copy README and LICENSE
+#
+- name: copy readme
+  template: src=templates/README
+      dest=/home/vagrant/README
+      mode=644
+      owner=vagrant group=vagrant
+
+- name: copy license
+  template: src=templates/LICENSE
+      dest=/home/vagrant/LICENSE
+      mode=644
+      owner=vagrant group=vagrant
+

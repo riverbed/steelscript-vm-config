@@ -1,9 +1,15 @@
 ---
-- name: update yum packages
-  shell: sudo yum update  
 
-- name: install docker engine.
-  shell: curl -fsSL https://get.docker.com/ | sh
+- name: copy docker.repo 
+  template: src=docker.repo
+      dest=/etc/yum.repos.d/docker.repo
+      mode=644
+
+- name: yum update
+  shell: sudo yum -y update
+
+- name: install docker engine
+  yum: name=docker-engine state=present
 
 - name: start the Docker daemon. 
   service: name=docker state=started

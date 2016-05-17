@@ -111,7 +111,7 @@ system_packages_redhat:
     - zlib-devel
 
     # dev libraries for other packages
-    #- openssl-devel
+    - openssl-devel
     #- bzip2-devel
     #- openldap-devel
     #- libxslt-devel
@@ -119,6 +119,7 @@ system_packages_redhat:
     - freetype-devel
     - graphviz
     - ncurses-devel
+    - libffi-devel
 
     # networking packages
     - net-snmp

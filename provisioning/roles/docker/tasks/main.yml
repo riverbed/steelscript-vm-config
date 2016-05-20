@@ -5,8 +5,8 @@
       dest=/etc/yum.repos.d/docker.repo
       mode=644
 
-- name: yum update
-  shell: sudo yum -y update
+- name: install lvm2
+  yum: name=lvm2 state=latest
 
 - name: install docker engine
   yum: name=docker-engine state=present

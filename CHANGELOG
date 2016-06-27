@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+[1.1]
+ * Support for docker and elasticsearch
+ * logging fixes.
+
 [1.0.1]
  * Rotate appfwk-related logfiles
  * Include SteelScript development workspace in /home/vagrant

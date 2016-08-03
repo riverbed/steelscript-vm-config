@@ -5,5 +5,5 @@
   shell: sudo docker pull elasticsearch
 
 - name: Run elasticsearch container
-  shell: docker run -p 9200:9200 -p 9300:9300 -d elasticsearch 
+  shell: sudo docker run -p 9200:9200 -p 9300:9300 -d elasticsearch 
 

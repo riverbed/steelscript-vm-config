@@ -17,7 +17,7 @@ system("
 Vagrant.configure("2") do |config|
 
   # this references the latest version in vagrant cloud
-  config.vm.box = "puppetlabs/centos-7.0-64-nocm"
+  config.vm.box = "puppetlabs/centos-7.2-64-nocm"
 
   config.ssh.guest_port = 22
 

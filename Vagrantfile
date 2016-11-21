@@ -29,13 +29,13 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider :virtualbox do |v, override|
       v.customize ["modifyvm", :id, "--cpus", 2]
-      v.customize ["modifyvm", :id, "--memory", 1024]
+      v.customize ["modifyvm", :id, "--memory", 2048]
       v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
 
   config.vm.provider :vmware_fusion do |v, override|
       v.vmx["numvcpus"] = "2"
-      v.vmx["memsize"] = "1024"
+      v.vmx["memsize"] = "2048"
   end
 
   # shared folder to synced sources directory

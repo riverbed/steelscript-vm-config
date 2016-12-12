@@ -26,19 +26,6 @@
   with_items: system_packages
 
 #
-# Open ports 80/443 TCP
-#
-- name: open firewall ports 80/443 TCP
-  firewalld: port={{ item }}
-      state=enabled
-      permanent=true
-      immediate=true
-  with_items:
-    - 80/tcp
-    - 443/tcp
-    - 8888/tcp
-
-#
 # Configure and enable ntpd
 #
 - name: configure ntpd

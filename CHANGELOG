@@ -1,6 +1,9 @@
 CHANGELOG
 =========
 
+[1.3]
+ * Support for custom built base vagrant box image.
+
 [1.1]
  * Support for docker and elasticsearch
  * logging fixes.

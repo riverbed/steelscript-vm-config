@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
   # this references the latest version in vagrant cloud
   config.vm.box = "steelscript-base-os"
   config.vm.box_url = ["http://cook.lab.nbttech.com/downloads/vagrant/steelscript-base-os.json"]
-  config.vm.define :steelscript_vm_1.2 do |t|
+  config.vm.define :steelscript_vm_1_2 do |t|
   end
 
   config.ssh.guest_port = 22

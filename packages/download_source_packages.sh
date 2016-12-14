@@ -13,14 +13,14 @@
 download() {
     BASEDIR=`pwd`
     DIRNAME=$BASEDIR/$1
-    PKGLIST=$BASEDIR/pkglists/$2
+    PKGLIST=$BASEDIR/../pkglists/$2
 
     mkdir $DIRNAME &> /dev/null
     cd $DIRNAME
 
     for pkg in `cat $PKGLIST | awk '{ print $1 }'`; do
         echo "===== Package: $pkg ====="
-        apt-get source -d $pkg
+        yumdownloader --downloadonly --source -d $pkg
     done
 
     cd $BASEDIR

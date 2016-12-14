@@ -52,7 +52,6 @@ steelscript_items:
     - {pkg: 'steelscript.steelhead', repo: 'steelscript-steelhead' }
     - {pkg: 'steelscript.scc', repo: 'steelscript-scc' }
     - {pkg: 'steelscript.stock', repo: 'steelscript-stock' }
-    - {pkg: 'steelscript.hero', repo: 'steelscript-hero' }
 
 system_packages_debian:
     # core packages

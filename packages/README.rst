@@ -34,6 +34,3 @@ Three new folders will be available:
     - sources-base-packages:  source packages from base linux image
     - sources-added-packages: source packages installed during provisioning
     - sources-python-pacakges: source python packages installed into the virtualenv
-
-Logs of the download process will be shown as well which
-could be searched for any errors during the download process.

@@ -18,9 +18,9 @@ download() {
     mkdir $DIRNAME &> /dev/null
     cd $DIRNAME
 
-    for pkg in `cat $PKGLIST | awk '{ print $1 }'`; do
+    for pkg in `cat $PKGLIST | awk '{ print $1 }' |awk -F. '{print $1}'`; do
         echo "===== Package: $pkg ====="
-        yumdownloader --downloadonly --source -d $pkg
+        yumdownloader --downloadonly --source $pkg
     done
 
     cd $BASEDIR
@@ -65,4 +65,4 @@ download $DIR $PKGLIST &> log_download_${DIR}.log
 DIR=sources-python-packages
 mkdir $DIR &> /dev/null
 echo "Downloading python packages to $DIR"
-pip install --no-use-wheel -d $DIR -r `pwd`/pkglists/pkgs_python.txt --allow-external django-admin-tools --allow-unverified django-admin-tools &> log_download_pkgs_python.log
+pip install --no-use-wheel -d $DIR -r `pwd`/../pkglists/pkgs_python.txt --allow-external django-admin-tools --allow-unverified django-admin-tools &> log_download_pkgs_python.log

@@ -88,6 +88,9 @@ shortcut for the following operations:
         $ sudo service celeryd restart
         $ sudo service httpd restart
 
+In the event that web clients can not access Internet, you should check out
+:ref:`offline mode` for steps on how to configure the App Framework server for
+offline access.
 
 Development App Framework Project
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

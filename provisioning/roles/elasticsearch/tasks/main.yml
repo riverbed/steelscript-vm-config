@@ -4,6 +4,16 @@
 - name: Install elasticsearch container
   shell: sudo docker pull elasticsearch
 
-- name: Run elasticsearch container
-  shell: sudo docker run -p 9200:9200 -p 9300:9300 -d elasticsearch 
+# configure elasticsearch to run as a service
 
+- name: create /etc/init.d/elasticsearch
+  template: src=etc.init.d.elasticsearch.j2
+      dest=/etc/init.d/elasticsearch
+      owner=root group=root mode=755
+
+- name: setup elasticsearch service runlevels
+  shell: >
+    chkconfig --add elasticsearch
+
+- name: start elasticsearch service
+  service: name=elasticsearch enabled=yes state=restarted

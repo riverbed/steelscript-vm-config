@@ -1,0 +1,102 @@
+#!/bin/bash
+# elasticsearch container daemon
+# chkconfig: 345 20 80
+# description: SteelScript AppFwk elasticsearch container daemon
+# processname: elasticsearch
+
+name=`basename $0`
+
+start_cmd="docker run -p 9200:9200 -p 9300:9300 -d $name"
+
+get_id() {
+    docker ps | grep $name | awk '{print $1}'
+}
+
+stop_cmd="docker stop `get_id`" 
+
+start_docker_cmd="service docker start"
+
+docker_pid_file="/var/run/docker.pid"
+
+docker_pid() {
+    cat "$docker_pid_file"
+}
+
+is_running() {
+    docker ps | grep $name > /dev/null 2>&1
+}
+
+docker_running() {
+    [ -f "$docker_pid_file" ] && ps `docker_pid` > /dev/null 2>&1 
+}
+
+case "$1" in
+    start)
+    if is_running; then
+        echo "Already started"
+    else
+	if ! docker_running; then
+           echo "Starting docker"
+           $start_docker_cmd > /dev/null 2>&1
+           if ! docker_running; then
+              echo "Unable to start docker, exit"
+              exit 1
+           fi
+        fi
+
+        echo "Starting $name"
+        $start_cmd > /dev/null 2>&1
+        if ! is_running; then
+            echo "Unable to start $name"
+            exit 1
+        fi
+    fi
+    ;;
+    stop)
+    if is_running; then
+        echo -n "Stopping $name.."
+        $stop_cmd > /dev/null 2>&1
+        for i in {1..10}
+        do
+            if ! is_running; then
+                break
+            fi
+
+            echo -n "."
+            sleep 1
+        done
+        echo
+
+        if is_running; then
+            echo "Not stopped; may still be shutting down or shutdown may have failed"
+            exit 1
+        else
+            echo "Stopped"
+        fi
+    else
+        echo "Not running"
+    fi
+    ;;
+    restart)
+    $0 stop
+    if is_running; then
+        echo "Unable to stop, will not attempt to start"
+        exit 1
+    fi
+    $0 start
+    ;;
+    status)
+    if is_running; then
+        echo "Running"
+    else
+        echo "Stopped"
+        exit 1
+    fi
+    ;;
+    *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+
+exit 0

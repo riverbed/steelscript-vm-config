@@ -9,5 +9,5 @@
   yum: name=docker-engine state=present
 
 - name: start the Docker daemon. 
-  service: name=docker state=started
+  service: name=docker enabled=yes state=restarted
 

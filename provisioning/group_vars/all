@@ -53,6 +53,9 @@ steelscript_items:
     - {pkg: 'steelscript.scc', repo: 'steelscript-scc' }
     - {pkg: 'steelscript.stock', repo: 'steelscript-stock' }
 
+steelscript_custom_items:
+    - {pkg: 'steelscript.hero', repo: 'steelscript-hero' }
+
 system_packages_debian:
     # core packages
     - build-essential
@@ -68,7 +71,8 @@ system_packages_debian:
     - openldap-dev
     - curl
     - wget
-    - wireshark
+    ### Will install custom built wireshark in base image.
+    # - wireshark
     - tshark
     # database packages
     - mysql-server

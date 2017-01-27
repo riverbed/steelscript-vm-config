@@ -73,7 +73,7 @@ system_packages_debian:
     - wget
     ### Will install custom built wireshark in base image.
     # - wireshark
-    - tshark
+    # - tshark
     # database packages
     - mysql-server
     - libmysqlclient-dev
@@ -129,7 +129,6 @@ system_packages_redhat:
     - net-snmp
     - curl
     - wget
-    - wireshark
 
     # python packages
     - python

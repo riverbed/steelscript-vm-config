@@ -11,6 +11,7 @@ WSGIPythonHome {{ virtualenv_devel }}
     WSGIPassAuthorization On
     Alias /static {{ project_root_apache }}/static
     WSGIScriptAlias / {{ project_wsgi }}/steelscript_appfwk.wsgi
+    WSGIApplicationGroup %{GLOBAL}
     WSGIDaemonProcess {{ project_name }} processes=2
     WSGIProcessGroup {{ project_name }}
 </VirtualHost>

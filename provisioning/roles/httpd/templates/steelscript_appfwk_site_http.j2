@@ -22,6 +22,7 @@ WSGIPythonHome {{ virtualenv_devel }}
     </Directory>
 
     WSGIScriptAlias / {{ project_wsgi }}/steelscript_appfwk.wsgi
+    WSGIApplicationGroup %{GLOBAL}
     WSGIDaemonProcess {{ project_name }} processes=2
     WSGIProcessGroup {{ project_name }}
 </VirtualHost>

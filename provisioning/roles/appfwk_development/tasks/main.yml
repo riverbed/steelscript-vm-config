@@ -19,7 +19,7 @@
       extra_args='-e'
       virtualenv={{ virtualenv_devel }}
       chdir=/src
-  with_items: steelscript_items
+  with_items: "{{ steelscript_items }}"
   sudo_user: vagrant
   when: deployment_type == "development"
 
@@ -31,7 +31,7 @@
       extra_args='-v'
       virtualenv={{ virtualenv_devel }}
       chdir=/src
-  with_items: steelscript_items
+  with_items: "{{ steelscript_items }}"
   sudo_user: vagrant
   when: deployment_type == "development-local"
 
@@ -39,7 +39,7 @@
 # use this for stable releases
 - name: distribution config - install steelscript packages and dependencies
   pip: name={{ item.pkg }} virtualenv={{ virtualenv_devel }}
-  with_items: steelscript_items
+  with_items: "{{ steelscript_items }}"
   sudo_user: vagrant
   when: deployment_type == "distribution"
 

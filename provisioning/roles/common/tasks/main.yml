@@ -6,7 +6,7 @@
 
 - name: install python system packages
   pip: name={{ item }}
-  with_items: python_packages
+  with_items: "{{ python_packages }}"
 
 - name: steelscript helper functions and aliases
   template: src=templates/vm_env.sh

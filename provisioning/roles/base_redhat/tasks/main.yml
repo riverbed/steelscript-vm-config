@@ -23,7 +23,7 @@
 #
 - name: install core system, networking, and python packages
   yum: name={{ item }} state=present
-  with_items: system_packages
+  with_items: "{{ system_packages }}"
 
 #
 # Configure and enable ntpd

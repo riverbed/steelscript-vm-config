@@ -50,7 +50,7 @@
   pip: name={{ item }}
       virtualenv={{ virtualenv_devel }}
   with_items:
-      - ipython[all]
+      - jupyter 
       - matplotlib
       - flower
       - graphviz

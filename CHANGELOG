@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+[1.4]
+ * Fix source download script
+ * Fix installing step of docker
+ * Add service script for elasticsearch
+ * Changes for wireshark upgrade
+ * Compatibility of new pandas version
+ * Replace ipython[all] with jupyter
+
 [1.3]
  * Support for custom built base vagrant box image.
 

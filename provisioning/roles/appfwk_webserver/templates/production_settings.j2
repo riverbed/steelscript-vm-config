@@ -4,6 +4,7 @@ from steelscript.appfwk.project.settings import *
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 DATAHOME = os.getenv('DATAHOME', PROJECT_ROOT)
 DATA_CACHE = os.path.join(DATAHOME, 'data', 'datacache')
+PCAP_STORE = os.path.join(DATAHOME, 'data', 'pcap')
 INITIAL_DATA = os.path.join(DATAHOME, 'data', 'initial_data')
 REPORTS_DIR = os.path.join(PROJECT_ROOT, 'reports')
 
@@ -144,8 +145,6 @@ LOCAL_ERROR_HANDLERS = (
 GLOBAL_ERROR_HANDLERS += LOCAL_ERROR_HANDLERS
 
 SECRET_KEY = '1=th-fh8*7vctk+664#qy*$-z#gy7(fs3i#(_tcug$h%@4+wk_'
-
-PCAP_STORE = '/steelscript/www/data/pcap'
 
 #OFFLINE_JS = True
 #STATICFILES_DIRS += (os.path.join(PROJECT_ROOT, 'offline'), )

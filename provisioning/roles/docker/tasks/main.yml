@@ -8,7 +8,13 @@
 - name: install docker CE version
   yum: name=docker-ce-17.06.0.ce-1.el7.centos state=present
 
-- name: install docker compose
-  pip: name=docker-compose
-       virtualenv={{ virtualenv_devel }}
-  sudo_user: vagrant
+- name: download docker compose binary file
+  get_url:
+    url: https://github.com/docker/compose/releases/download/1.14.0/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+
+# Add execution mode to the file docker-compose
+- file:
+    path: /usr/local/bin/docker-compose
+    state: touch
+    mode: "u=rwx,g=rx,o=rx"

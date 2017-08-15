@@ -17,7 +17,7 @@
       - appfwk_development
       - appfwk_webserver
       - httpd
-      #- docker
+      - docker
       #- elasticsearch
 
       # debian/ubuntu os

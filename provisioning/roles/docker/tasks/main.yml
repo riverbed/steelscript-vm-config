@@ -1,13 +1,9 @@
 ---
 
-- name: copy docker.repo 
-  template: src=docker.repo
-      dest=/etc/yum.repos.d/docker.repo
+- name: copy docker-ce.repo
+  template: src=docker-ce.repo
+      dest=/etc/yum.repos.d/docker-ce.repo
       mode=644
 
-- name: install docker engine
-  yum: name=docker-engine state=present
-
-- name: start the Docker daemon. 
-  service: name=docker enabled=yes state=restarted
-
+- name: install docker CE version
+  yum: name=docker-ce-17.06.0.ce-1.el7.centos state=present

@@ -144,6 +144,11 @@ system_packages_redhat:
     - mod_ssl
     - mod_wsgi
 
+    # docker dependencies
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+
 system_packages: "{{ system_packages_redhat }}"
 
 python_packages:

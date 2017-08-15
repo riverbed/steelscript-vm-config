@@ -40,11 +40,10 @@ dev_django_password: djangoSteelScriptDev!
 deployment_type: development
 
 steelscript_items:
-    - {pkg: 'reschema', repo: 'reschema'}
-    - {pkg: 'sleepwalker', repo: 'sleepwalker'}
     - {pkg: 'steelscript', repo: 'steelscript' }
     - {pkg: 'steelscript.netprofiler', repo: 'steelscript-netprofiler' }
     - {pkg: 'steelscript.netshark', repo: 'steelscript-netshark' }
+    - {pkg: 'steelscript.appresponse', repo: 'steelscript-appresponse' }
     - {pkg: 'steelscript.appfwk', repo: 'steelscript-appfwk' }
     - {pkg: 'steelscript.appfwk.business-hours', repo: 'steelscript-appfwk-business-hours' }
     - {pkg: 'steelscript.wireshark', repo: 'steelscript-wireshark' }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+[1.5]
+ * Add PCAP file manager
+ * Install docker
+ * Install steelscript.appresponse package
+
 [1.4]
  * Fix source download script
  * Fix installing step of docker

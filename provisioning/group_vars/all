@@ -44,6 +44,7 @@ steelscript_items:
     - {pkg: 'steelscript.netprofiler', repo: 'steelscript-netprofiler' }
     - {pkg: 'steelscript.netshark', repo: 'steelscript-netshark' }
     - {pkg: 'steelscript.appresponse', repo: 'steelscript-appresponse' }
+    - {pkg: 'steelscript.packets', repo: 'steelscript-packets' }
     - {pkg: 'steelscript.appfwk', repo: 'steelscript-appfwk' }
     - {pkg: 'steelscript.appfwk.business-hours', repo: 'steelscript-appfwk-business-hours' }
     - {pkg: 'steelscript.wireshark', repo: 'steelscript-wireshark' }

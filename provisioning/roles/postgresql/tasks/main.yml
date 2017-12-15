@@ -10,9 +10,15 @@
       - psycopg2
   sudo_user: vagrant
 
-- name: postgresql - initialize database
-  command: service postgresql initdb
-           creates=/var/lib/pgsql/data/postgresql.conf
+- name: postgresql - initialize database the right way
+  shell: >
+    initdb -D /var/lib/pgsql/data
+    creates=/var/lib/pgsql/data/postgresql.conf
+  become: true
+  become_user: postgres
+  environment:
+    LC_ALL: en_US.UTF-8
+    LANG: en_US.UTF-8
 
 - name: start and enable postgresql service
   service: name=postgresql state=started enabled=yes

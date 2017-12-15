@@ -5,8 +5,8 @@
   gather_facts: false
   vars:
       #deployment_type: 'development'
-      deployment_type: 'development-local'
-      #deployment_type: 'distribution'
+      #deployment_type: 'development-local'
+      deployment_type: 'distribution'
 
   roles:
       # redhat os

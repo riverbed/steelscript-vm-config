@@ -60,7 +60,8 @@
       . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_apache }}
       chdir={{ project_home_apache }}
       creates={{ project_root_apache }}
-  sudo_user: "{{ project_owner_apache }}"
+  become: true
+  become_user: "{{ project_owner_apache }}"
   environment:
       HOME: "{{ project_home_apache }}"
 
@@ -88,7 +89,8 @@
       . {{ virtualenv_devel }}/bin/activate && python manage.py reset_appfwk --force --drop-users --trace && touch .initialized
       chdir={{ project_root_apache }}
       creates={{ project_root_apache }}/.initialized
-  sudo_user: "{{ project_owner_apache }}"
+  become: true
+  become_user: "{{ project_owner_apache }}"
   environment:
       HOME: "{{ project_home_apache }}"
   notify:
@@ -99,7 +101,8 @@
       . {{ virtualenv_devel }}/bin/activate && python manage.py collectstatic --noinput
       chdir={{ project_root_apache }}
       creates={{ project_root_apache }}/static
-  sudo_user: "{{ project_owner_apache }}"
+  become: true
+  become_user: "{{ project_owner_apache }}"
   environment:
       HOME: "{{ project_home_apache }}"
   notify:

@@ -5,7 +5,8 @@
 - name: create virtualenv
   shell: virtualenv {{ virtualenv_devel }}
       creates={{ virtualenv_devel }}/bin/activate
-  sudo_user: vagrant
+  become: true
+  become_user: vagrant
 
 - name: create source directory for redis and other 3rd party code
   file: path={{ project_home_devel }}/src
@@ -20,7 +21,8 @@
       virtualenv={{ virtualenv_devel }}
       chdir=/src
   with_items: "{{ steelscript_items }}"
-  sudo_user: vagrant
+  become: true
+  become_user: vagrant
   when: deployment_type == "development"
 
 # install the development packages directly
@@ -32,7 +34,8 @@
       virtualenv={{ virtualenv_devel }}
       chdir=/src
   with_items: "{{ steelscript_items }}"
-  sudo_user: vagrant
+  become: true
+  become_user: vagrant
   when: deployment_type == "development-local"
 
 # install released packages directly
@@ -40,7 +43,8 @@
 - name: distribution config - install steelscript packages and dependencies
   pip: name={{ item.pkg }} virtualenv={{ virtualenv_devel }}
   with_items: "{{ steelscript_items }}"
-  sudo_user: vagrant
+  become: true
+  become_user: vagrant
   when: deployment_type == "distribution"
 
 #
@@ -50,11 +54,13 @@
   pip: name={{ item }}
       virtualenv={{ virtualenv_devel }}
   with_items:
-      - jupyter 
+      - jupyter
       - matplotlib
       - flower
       - graphviz
-  sudo_user: vagrant
+      - mock
+  become: true
+  become_user: vagrant
 
 #
 # create development appfwk project
@@ -64,7 +70,8 @@
       . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_devel }}
       chdir={{ project_home_devel }}
       creates={{ project_root_devel }}
-  sudo_user: vagrant
+  become: true
+  become_user: vagrant
 
 - name: copy local project settings
   template: src=local_settings.j2
@@ -77,7 +84,8 @@
       {{ virtualenv_devel }}/bin/python manage.py reset_appfwk --drop-users --force && touch .initialized
       chdir={{ project_root_devel }}
       creates={{ project_root_devel }}/.initialized
-  sudo_user: vagrant
+  become: true
+  become_user: vagrant
 
 #
 # create development workspace
@@ -87,5 +95,6 @@
       . {{ virtualenv_devel }}/bin/activate && steel mkworkspace -d steelscript-workspace
       chdir={{ project_home_devel }}
       creates={{ project_home_devel }}/steelscript-workspace
-  sudo_user: vagrant
+  become: true
+  become_user: vagrant
 

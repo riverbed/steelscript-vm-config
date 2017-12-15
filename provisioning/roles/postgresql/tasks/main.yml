@@ -8,7 +8,8 @@
   pip: name={{item}} virtualenv={{ virtualenv_devel }}
   with_items:
       - psycopg2
-  sudo_user: vagrant
+  become: true
+  become_user: vagrant
 
 - name: postgresql - initialize database the right way
   shell: >

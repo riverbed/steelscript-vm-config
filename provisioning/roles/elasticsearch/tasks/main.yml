@@ -1,8 +1,8 @@
 ---
-# install elasticsearch via docker 
+# install elasticsearch via docker
 
 - name: Install elasticsearch container
-  shell: sudo docker pull elasticsearch
+  shell: docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 
 # configure elasticsearch to run as a service
 
@@ -11,9 +11,33 @@
       dest=/etc/init.d/elasticsearch
       owner=root group=root mode=755
 
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html#docker-cli-run-prod-mode
+- name: apply vm settings
+  sysctl:
+    name: vm.max_map_count
+    value: 262144
+    sysctl_set: yes
+    reload: yes
+
+- name: add persistent datastore
+  file:
+    path: /var/elasticdata
+    owner: root
+    group: root
+    mode: 0777
+    state: directory
+
 - name: setup elasticsearch service runlevels
   shell: >
     chkconfig --add elasticsearch
 
 - name: start elasticsearch service
   service: name=elasticsearch enabled=yes state=restarted
+
+# add service for kibana, but dont start it automatically
+
+- name: create /etc/init.d/kibana
+  template: src=etc.init.d.kibana.j2
+      dest=/etc/init.d/kibana
+      owner=root group=root mode=755
+

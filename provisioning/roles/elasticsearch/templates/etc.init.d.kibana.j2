@@ -1,16 +1,16 @@
 #!/bin/bash
-# elasticsearch container daemon
+# kibana container daemon
 # chkconfig: 345 20 80
-# description: SteelScript AppFwk elasticsearch container daemon
-# processname: elasticsearch
+# description: Kibana the elasticsearch UI daemon
+# processname: kibana
 
 #name=`basename $0`
 
 # name is a bit more complicated now
-name="elasticsearch"
-image="{{ elasticsearch_image }}"
+name="kibana"
+image="{{ kibana_image }}"
 
-start_cmd="docker run --rm -p 9200:9200 -p 9300:9300 -d -e ES_JAVA_OPTS=\"-Xms512m -Xmx512m\" -v /var/elasticdata:/usr/share/elasticsearch/data --name=$name $image"
+start_cmd="docker run -p 5601:5601 -d --name=$name --link elasticsearch $image"
 
 get_id() {
     docker ps | grep $name | awk '{print $1}'
@@ -49,9 +49,7 @@ case "$1" in
         fi
 
         echo "Starting $name"
-        # need to eval because the ES_JAVA_OPTS will get parsed
-        # strangely and extra quotes will be added incorrectly by shell
-        eval "$start_cmd" > /dev/null 2>&1
+        $start_cmd > /dev/null 2>&1
         if ! is_running; then
             echo "Unable to start $name"
             exit 1

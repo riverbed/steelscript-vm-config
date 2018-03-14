@@ -18,3 +18,24 @@
     path: /usr/local/bin/docker-compose
     state: touch
     mode: "u=rwx,g=rx,o=rx"
+
+- name: enable docker service
+  service:
+    name: docker
+    enabled: yes
+
+- name: start docker service
+  service:
+    name: docker
+    state: restarted
+
+- name: create docker group
+  group:
+    name: docker
+    state: present
+
+- name: add user to docker group
+  user:
+    name: vagrant
+    groups: docker
+    append: yes

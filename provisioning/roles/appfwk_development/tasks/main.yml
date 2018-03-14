@@ -62,30 +62,30 @@
   become: true
   become_user: vagrant
 
+##
+## create development appfwk project
+##
+#- name: create app framework project directory
+#  shell: >
+#      . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_devel }}
+#      chdir={{ project_home_devel }}
+#      creates={{ project_root_devel }}
+#  become: true
+#  become_user: vagrant
 #
-# create development appfwk project
+#- name: copy local project settings
+#  template: src=local_settings.j2
+#      dest={{ project_root_devel }}/local_settings.py
+#      mode=664
+#      owner={{ project_owner_devel }} group={{ project_group_devel }}
 #
-- name: create app framework project directory
-  shell: >
-      . {{ virtualenv_devel }}/bin/activate && steel appfwk mkproject -d {{ project_root_devel }}
-      chdir={{ project_home_devel }}
-      creates={{ project_root_devel }}
-  become: true
-  become_user: vagrant
-
-- name: copy local project settings
-  template: src=local_settings.j2
-      dest={{ project_root_devel }}/local_settings.py
-      mode=664
-      owner={{ project_owner_devel }} group={{ project_group_devel }}
-
-- name: reset framework with new settings
-  shell: >
-      {{ virtualenv_devel }}/bin/python manage.py reset_appfwk --drop-users --force && touch .initialized
-      chdir={{ project_root_devel }}
-      creates={{ project_root_devel }}/.initialized
-  become: true
-  become_user: vagrant
+#- name: reset framework with new settings
+#  shell: >
+#      {{ virtualenv_devel }}/bin/python manage.py reset_appfwk --drop-users --force && touch .initialized
+#      chdir={{ project_root_devel }}
+#      creates={{ project_root_devel }}/.initialized
+#  become: true
+#  become_user: vagrant
 
 #
 # create development workspace
